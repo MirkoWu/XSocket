@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.core.io;
 
 public abstract class LoopThread implements Runnable {
     protected volatile Thread coreThread;
@@ -6,8 +6,6 @@ public abstract class LoopThread implements Runnable {
     protected String name = this.getClass().getSimpleName();
     protected volatile Exception exception;
 
-    LoopThread() {
-    }
 
     public LoopThread start() {
         if (!isRunning) {
@@ -15,9 +13,7 @@ public abstract class LoopThread implements Runnable {
             coreThread = new Thread(this, name);
             coreThread.start();
         }
-
         return this;
-
     }
 
 
@@ -28,8 +24,6 @@ public abstract class LoopThread implements Runnable {
             while (isRunning && !Thread.currentThread().isInterrupted()) {
                 onLoopExec();
             }
-        } catch (InterruptedException e) {
-
         } catch (Exception e) {
             exception = e;
         } finally {
@@ -38,17 +32,26 @@ public abstract class LoopThread implements Runnable {
         }
     }
 
-    public void shutDown() {
+    public void shutdown(Exception e) {
+        this.exception = e;
+        shutdown();
+    }
+
+    public void shutdown() {
         isRunning = false;
         if (coreThread != null) {
-            coreThread.interrupt();
+            try {
+                coreThread.interrupt();
+            } catch (SecurityException e) {
+            }
         }
         coreThread = null;
     }
 
 
+    protected abstract void onLoopStart();
 
-    protected abstract void onLoopStart() ;
-    protected abstract void onLoopEnd(Exception e) ;
-    protected abstract void onLoopExec() ;
+    protected abstract void onLoopExec();
+
+    protected abstract void onLoopEnd(Exception e);
 }

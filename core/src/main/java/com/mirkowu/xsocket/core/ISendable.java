@@ -1,4 +1,6 @@
 package com.mirkowu.xsocket.core;
 
-public class ISendable {
+public interface ISendable {
+
+    byte[] getData();
 }
