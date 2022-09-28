@@ -7,7 +7,7 @@ public interface ISender {
 
     boolean send();
 
-    void offer(ISendable sendable);
+    void offer(byte[] bytes);
     void close();
 
 }

@@ -23,4 +23,11 @@ public class IPConfig {
         return super.equals(obj);
     }
 
+
+    @Override
+    public int hashCode() {
+        int result = ip.hashCode();
+        result = 31 * result + port;
+        return result;
+    }
 }

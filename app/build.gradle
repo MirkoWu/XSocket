@@ -2,13 +2,15 @@ plugins {
     id 'com.android.application'
 }
 
+def ext = rootProject.ext
 android {
-    compileSdk 32
+    compileSdkVersion ext.compileSdkVersion
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.mirkowu.xsocekt"
-        minSdk 21
-        targetSdk 32
+        applicationId "com.mirkowu.xsocket"
+        minSdkVersion ext.minSdkVersion
+        targetSdkVersion ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 

@@ -1,9 +1,12 @@
 package com.mirkowu.xsocket.core;
 
+import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.ActionType;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
-import com.mirkowu.xsocket.core.io.DuplexReceiverThread;
-import com.mirkowu.xsocket.core.io.DuplexSenderThread;
-import com.mirkowu.xsocket.core.io.IOThreadManager;
+import com.mirkowu.xsocket.core.client.IOThreadManager;
+import com.mirkowu.xsocket.core.action.ActionDispatcher;
+import com.mirkowu.xsocket.core.listener.IClientActionListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +28,8 @@ public class ConnectManagerImp implements IConnectManager {
     IOThreadManager ioThreadManager;
     ConnectThread connectThread;
 
+    ActionDispatcher actionDispatcher;
+
     public ConnectManagerImp(IPConfig config) {
         this(config, Options.defaultOptions());
     }
@@ -32,6 +37,7 @@ public class ConnectManagerImp implements IConnectManager {
     public ConnectManagerImp(IPConfig config, Options options) {
         this.ipConfig = config;
         this.options = options;
+        actionDispatcher = new ActionDispatcher(this, ipConfig);
     }
 
 
@@ -52,36 +58,46 @@ public class ConnectManagerImp implements IConnectManager {
         public void run() {
             if (ipConfig != null) {
 
-                OutputStream outputStream = null;
-                InputStream inputStream = null;
                 int TIME_OUT = 60 * 1000;
                 try {
                     socket = new Socket();
 
-                    socket.setReuseAddress(true);//复用端口
-                    socket.setKeepAlive(true);
+//                    socket.setReuseAddress(true);//复用端口
+//                    socket.setKeepAlive(true);
+//                    socket.setSoTimeout(TIME_OUT);
 
-                    socket.setSoTimeout(TIME_OUT);
                     SocketAddress socketAddress = new InetSocketAddress(ipConfig.ip, ipConfig.port);
+
+//                     socket.bind(socketAddress);
+//
                     socket.connect(socketAddress, TIME_OUT);
 
-                    inputStream = socket.getInputStream();
-                    outputStream = socket.getOutputStream();
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+                    XLog.e("Start connect: " + ipConfig.ip + ":" + ipConfig.port + " socket server...");
+                    //关闭Nagle算法,无论TCP数据报大小,立即发送
+                    socket.setTcpNoDelay(true);
+
+                    InputStream inputStream = socket.getInputStream();
+                    OutputStream outputStream = socket.getOutputStream();
+
+                    ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
+                    ioThreadManager.start();
+
+                    dispatchAction(ActionType.ACTION_CONNECT_SUCCESS);
+
+                } catch (Exception e) {
+                    dispatchAction(ActionType.ACTION_CONNECT_FAIL, new ActionBean(e));
                     e.printStackTrace();
                 }
-
-                ioThreadManager = new IOThreadManager(inputStream, outputStream, options);
-                ioThreadManager.start();
+            } else {
+                dispatchAction(ActionType.ACTION_CONNECT_FAIL, new ActionBean(new RuntimeException("ip参数不能为空！")));
             }
         }
     }
 
-    public void send(ISendable sendable) {
-        if (ioThreadManager != null && sendable != null && isConnected()) {
-            ioThreadManager.send(sendable);
+    @Override
+    public void send(byte[] bytes) {
+        if (ioThreadManager != null && bytes != null && isConnected()) {
+            ioThreadManager.send(bytes);
         }
     }
 
@@ -125,6 +141,7 @@ public class ConnectManagerImp implements IConnectManager {
                     try {
                         connectThread.join();
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                     connectThread = null;
                 }
@@ -135,12 +152,14 @@ public class ConnectManagerImp implements IConnectManager {
                     } catch (IOException e) {
                     }
                 }
+
+
             } finally {
                 isDisconnecting = false;
 //                isConnectionPermitted = true;
 //                if (!(mException instanceof UnConnectException) && mSocket != null) {
-//                    mException = mException instanceof ManuallyDisconnectException ? null : mException;
-//                    sendBroadcast(IAction.ACTION_DISCONNECTION, mException);
+//                    mException = mException instanceof ManualCloseException ? null : mException;
+                dispatchAction(ActionType.ACTION_DISCONNECT, new ActionBean(mException));
 //                }
                 socket = null;
 
@@ -168,4 +187,25 @@ public class ConnectManagerImp implements IConnectManager {
     public boolean isDisconnecting() {
         return isDisconnecting;
     }
+
+
+    @Override
+    public void registerActionListener(IClientActionListener listener) {
+        actionDispatcher.registerClientActionListener(listener);
+    }
+
+    @Override
+    public void unRegisterActionListener(IClientActionListener listener) {
+        actionDispatcher.unRegisterClientActionListener(listener);
+    }
+
+    void dispatchAction(int action) {
+        actionDispatcher.dispatch(action);
+    }
+
+    void dispatchAction(int action, ActionBean actionBean) {
+        actionDispatcher.dispatch(action, actionBean);
+    }
+
+
 }

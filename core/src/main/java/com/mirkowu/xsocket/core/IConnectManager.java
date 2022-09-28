@@ -1,9 +1,15 @@
 package com.mirkowu.xsocket.core;
 
-public interface IConnectManager {
+import com.mirkowu.xsocket.core.listener.IClientActionListener;
+import com.mirkowu.xsocket.core.listener.IRegister;
+
+public interface IConnectManager extends IRegister<IClientActionListener> {
     void connect();
 
+    void send(byte[] bytes);
+
     void disconnect();
+
     void disconnect(Exception e);
 
 
@@ -12,4 +18,5 @@ public interface IConnectManager {
     boolean isConnected();
 
     boolean isDisconnecting();
+
 }

@@ -1,10 +1,13 @@
 package com.mirkowu.xsocket.core;
 
+import com.mirkowu.xsocket.core.server.IServerManager;
+import com.mirkowu.xsocket.core.server.ServerManagerImp;
+
 public class XSocket {
 
 
 
-    public IConnectManager connect(String ip, int port) {
+    public  IConnectManager connect(String ip, int port) {
         return CacheManager.getInstance().get(new IPConfig(ip, port));
     }
 
@@ -30,5 +33,10 @@ public class XSocket {
         return this;
     }
 
+
+    public IServerManager startServer(){
+        IServerManager serverManager=  new ServerManagerImp();
+        return serverManager;
+    }
 
 }

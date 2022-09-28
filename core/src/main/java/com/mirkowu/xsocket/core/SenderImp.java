@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class SenderImp implements ISender {
     OutputStream outputStream;
-    LinkedBlockingQueue<ISendable> queue = new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<byte[]> queue = new LinkedBlockingQueue<>();
 
     @Override
     public void init(OutputStream outputStream) {
@@ -15,22 +15,19 @@ public class SenderImp implements ISender {
 
     @Override
     public boolean send() {
-        ISendable sendable = null;
+        byte[] bytes = null;
         try {
-            sendable = queue.take();
+            bytes = queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (sendable != null) {
-            byte[] data = sendable.getData();
-            if (data != null) {
-                try {
-                    outputStream.write(data);
-                    outputStream.flush();
-                    return true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if (bytes != null) {
+            try {
+                outputStream.write(bytes);
+                outputStream.flush();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -38,8 +35,8 @@ public class SenderImp implements ISender {
     }
 
     @Override
-    public void offer(ISendable sendable) {
-        queue.offer(sendable);
+    public void offer(byte[] bytes) {
+        queue.offer(bytes);
     }
 
     @Override

@@ -1,10 +1,14 @@
 package com.mirkowu.xsocket.core;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ReceiverImp implements IReceiver {
+    public static final int BUFF_SIZE = 1024;
     InputStream inputStream;
+    byte[] recBuffer = new byte[BUFF_SIZE];
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     @Override
     public void init(InputStream inputStream) {
@@ -13,32 +17,39 @@ public class ReceiverImp implements IReceiver {
 
     @Override
     public byte[] receive() {
+//        try {
+//            if (inputStream.available() <= 0) return null;
+//            byte[] data = new byte[inputStream.available()];
+//            inputStream.read(data);
+//            return data;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         try {
-            if (inputStream.available() <= 0) return null;
-            byte[] data = new byte[inputStream.available()];
-            inputStream.read(data);
+            bos.reset();
+            int len= inputStream.read(recBuffer);
+            bos.write(recBuffer, 0, len);
+            byte[] data = bos.toByteArray();
             return data;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
-//        ByteArrayOutputStream outSteam = new ByteArrayOutputStream();
-//        int length;
-//        while ((length = inputStream.read(recBuffer)) != -1) {
-//            outSteam.write(recBuffer, 0, length);
-//        }
-//        outSteam.close();
-//        byte[] rec = outSteam.toByteArray();
+
     }
 
     @Override
     public void close() {
-        if (inputStream != null) {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            if (bos != null) {
+                bos.close();
             }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

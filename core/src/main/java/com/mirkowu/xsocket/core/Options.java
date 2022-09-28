@@ -16,6 +16,9 @@ public class Options {
     public Options setSender(ISender sender) {
         this.sender = sender;
         return this;
+    }  public Options setIOThreadMode(IOThreadMode ioThreadMode) {
+        this.ioThreadMode = ioThreadMode;
+        return this;
     }
 
     public IReceiver getReceiver() {
