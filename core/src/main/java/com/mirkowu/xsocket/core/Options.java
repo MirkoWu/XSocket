@@ -7,6 +7,7 @@ public class Options {
     private IReceiver receiver;
     private ISender sender;
     private IOThreadMode ioThreadMode;
+    private AbsReconnectionManager reconnectionManager;
 
     public Options setReceiver(IReceiver receiver) {
         this.receiver = receiver;
@@ -16,8 +17,15 @@ public class Options {
     public Options setSender(ISender sender) {
         this.sender = sender;
         return this;
-    }  public Options setIOThreadMode(IOThreadMode ioThreadMode) {
+    }
+
+    public Options setIOThreadMode(IOThreadMode ioThreadMode) {
         this.ioThreadMode = ioThreadMode;
+        return this;
+    }
+
+    public Options setReconnectionManager(AbsReconnectionManager reconnectionManager) {
+        this.reconnectionManager = reconnectionManager;
         return this;
     }
 
@@ -33,10 +41,14 @@ public class Options {
         return ioThreadMode;
     }
 
+    public AbsReconnectionManager getReconnectionManager() {
+        return reconnectionManager;
+    }
 
     public static Options defaultOptions() {
         Options options = new Options();
         options.ioThreadMode = IOThreadMode.DUPLEX;
+        options.reconnectionManager = new DefaultReconnectManager();
         return options;
     }
 }

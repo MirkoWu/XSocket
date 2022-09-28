@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.mirkowu.xsocket.core.IConnectManager;
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.listener.IClientActionListener;
+import com.mirkowu.xsocket.core.listener.ISocketListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,10 +27,10 @@ public class ActionDispatcher implements IActionDispatcher {
 //    public static HandleDispatcher getInstance() {
 //        return Holder.INSTANCE;
 //    }
-    private IConnectManager connectManager;
-    private IPConfig ipConfig;
+    private volatile IConnectManager connectManager;
+    private volatile IPConfig ipConfig;
 
-    private List<IClientActionListener> listenerList = new ArrayList<>();
+    private volatile List<ISocketListener> listenerList = new ArrayList<>();
 
     public ActionDispatcher(IConnectManager connectManager, IPConfig ipConfig) {
         this.connectManager = connectManager;
@@ -46,7 +46,7 @@ public class ActionDispatcher implements IActionDispatcher {
         }
     };
 
-    private void handleAction(int action, ActionBean bean, IClientActionListener listener) {
+    private void handleAction(int action, ActionBean bean, ISocketListener listener) {
         switch (action) {
             case ActionType.ACTION_SEND:
                 listener.onSend(ipConfig, (byte[]) bean.data);
@@ -63,17 +63,20 @@ public class ActionDispatcher implements IActionDispatcher {
             case ActionType.ACTION_DISCONNECT:
                 listener.onDisConnect(ipConfig, (Exception) bean.data);
                 break;
+            case ActionType.ACTION_RECONNECT:
+                listener.onReconnect(ipConfig);
+                break;
         }
     }
 
 
-    public void registerClientActionListener(IClientActionListener listener) {
+    public void registerClientActionListener(ISocketListener listener) {
         if (listener != null && !listenerList.contains(listener)) {
             listenerList.add(listener);
         }
     }
 
-    public void unRegisterClientActionListener(IClientActionListener listener) {
+    public void unRegisterClientActionListener(ISocketListener listener) {
         if (listenerList.contains(listener)) {
             listenerList.remove(listener);
         }
@@ -86,23 +89,31 @@ public class ActionDispatcher implements IActionDispatcher {
     }
 
     @Override
-    public void dispatch(int action, ActionBean bean) {
-        List<IClientActionListener> copyData = new ArrayList<>(listenerList);
-        Iterator<IClientActionListener> it = copyData.iterator();
+    public synchronized void dispatch(int action, ActionBean bean) {
+//        List<ISocketListener> copyData = new ArrayList<>(listenerList);
+//        Iterator<ISocketListener> it = copyData.iterator();
+        Iterator<ISocketListener> it = listenerList.iterator();
         while (it.hasNext()) {
-            IClientActionListener listener = it.next();
+            ISocketListener listener = it.next();
             dispatchActionToListener(action, bean, listener);
         }
     }
 
-    public void dispatchActionToListener(int action, ActionBean bean, IClientActionListener listener) {
+    public synchronized void dispatchActionToListener(int action, ActionBean bean, ISocketListener listener) {
         if (bean == null) bean = new ActionBean();
         bean.listener = listener;
 
-        Message message = Message.obtain();
-        message.arg1 = action;
-        message.obj = bean;
-        mHandler.sendMessage(message);
+//        Message message = Message.obtain();
+//        message.arg1 = action;
+//        message.obj = bean;
+//        mHandler.sendMessage(message);
+        ActionBean finalBean = bean;
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                handleAction(action, finalBean, listener);
+            }
+        });
     }
 
 

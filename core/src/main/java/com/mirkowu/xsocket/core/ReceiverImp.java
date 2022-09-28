@@ -16,7 +16,7 @@ public class ReceiverImp implements IReceiver {
     }
 
     @Override
-    public byte[] receive() {
+    public byte[] receive() throws IOException {
 //        try {
 //            if (inputStream.available() <= 0) return null;
 //            byte[] data = new byte[inputStream.available()];
@@ -33,10 +33,8 @@ public class ReceiverImp implements IReceiver {
             return data;
         } catch (IOException e) {
             e.printStackTrace();
+            throw e;
         }
-
-        return null;
-
     }
 
     @Override

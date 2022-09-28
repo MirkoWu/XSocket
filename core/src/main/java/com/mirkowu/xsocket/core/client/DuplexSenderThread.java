@@ -23,7 +23,7 @@ public class DuplexSenderThread extends LoopThread {
     }
 
     @Override
-    protected void onLoopExec() {
+    protected void onLoopExec() throws Exception{
         if (sender != null) {
             boolean result = sender.send();
             dispatcher.dispatch(ActionType.ACTION_SEND);

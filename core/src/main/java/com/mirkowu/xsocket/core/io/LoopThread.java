@@ -3,6 +3,7 @@ package com.mirkowu.xsocket.core.io;
 public abstract class LoopThread implements Runnable {
     protected volatile Thread coreThread;
     protected volatile boolean isRunning = false;
+    protected volatile boolean isShutdown = false;
     protected String threadName = this.getClass().getSimpleName();
     protected volatile Exception exception;
 
@@ -54,9 +55,13 @@ public abstract class LoopThread implements Runnable {
     }
 
 
+    public boolean isRunning(){
+        return isRunning;
+    }
+
     protected abstract void onLoopStart();
 
-    protected abstract void onLoopExec();
+    protected abstract void onLoopExec() throws Exception;
 
     protected abstract void onLoopEnd(Exception e);
 }

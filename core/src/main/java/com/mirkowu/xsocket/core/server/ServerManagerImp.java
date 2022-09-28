@@ -67,4 +67,27 @@ public class ServerManagerImp implements IServerManager {
 
         }
     }
+
+    @Override
+    public void shutdown() {
+        if (mServerSocket == null) {
+            return;
+        }
+
+//        if (mClientPoolImpl != null) {
+//            mClientPoolImpl.serverDown();
+//        }
+
+        try {
+            mServerSocket.close();
+        } catch (IOException e) {
+        }
+
+        mServerSocket = null;
+//        mClientPoolImpl = null;
+//        mAcceptThread.shutdown(new InitiativeDisconnectException());
+        mAcceptThread = null;
+
+//        sendBroadcast(IAction.Server.ACTION_SERVER_ALLREADY_SHUTDOWN);
+    }
 }

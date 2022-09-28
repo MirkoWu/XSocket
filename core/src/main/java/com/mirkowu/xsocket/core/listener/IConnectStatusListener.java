@@ -9,5 +9,5 @@ public interface IConnectStatusListener {
 
     void onDisConnect(IPConfig config, Exception e);
 
-    void onReConnect(IPConfig config);
+    void onReconnect(IPConfig config);
 }

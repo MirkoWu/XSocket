@@ -5,7 +5,7 @@ import java.io.OutputStream;
 public interface ISender {
     void init(OutputStream outputStream);
 
-    boolean send();
+    boolean send() throws  Exception;
 
     void offer(byte[] bytes);
     void close();

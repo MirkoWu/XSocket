@@ -1,17 +1,16 @@
 package com.mirkowu.xsocket.core.action;
 
-import com.mirkowu.xsocket.core.listener.IClientActionListener;
+import com.mirkowu.xsocket.core.listener.ISocketListener;
 
 public class ActionBean {
-    IClientActionListener listener;
     Object data;
+    volatile ISocketListener listener;
 
-
-    public ActionBean( ){
-
+    public ActionBean() {
     }
-    public ActionBean(Object data){
-        this.data=data;
+
+    public ActionBean(Object data) {
+        this.data = data;
     }
 
 }

@@ -14,12 +14,13 @@ public class SenderImp implements ISender {
     }
 
     @Override
-    public boolean send() {
+    public boolean send() throws Exception {
         byte[] bytes = null;
         try {
             bytes = queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            throw e;
         }
         if (bytes != null) {
             try {
@@ -28,6 +29,8 @@ public class SenderImp implements ISender {
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
+                throw e;
+
             }
         }
 

@@ -6,7 +6,7 @@ import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.client.IOThreadManager;
 import com.mirkowu.xsocket.core.action.ActionDispatcher;
-import com.mirkowu.xsocket.core.listener.IClientActionListener;
+import com.mirkowu.xsocket.core.listener.ISocketListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.SocketException;
 
 public class ConnectManagerImp implements IConnectManager {
 
@@ -24,11 +23,14 @@ public class ConnectManagerImp implements IConnectManager {
 
     Options options;
     Socket socket;
-    volatile boolean isDisconnecting;
+    volatile boolean isDisconnecting = false;
+    volatile boolean isAllowConnect = true;
     IOThreadManager ioThreadManager;
     ConnectThread connectThread;
 
     ActionDispatcher actionDispatcher;
+
+    AbsReconnectionManager reconnectManager;
 
     public ConnectManagerImp(IPConfig config) {
         this(config, Options.defaultOptions());
@@ -38,11 +40,36 @@ public class ConnectManagerImp implements IConnectManager {
         this.ipConfig = config;
         this.options = options;
         actionDispatcher = new ActionDispatcher(this, ipConfig);
+      //  reconnectManager = new DefaultReconnectManager(actionDispatcher);
     }
 
 
     @Override
-    public void connect() {
+    public synchronized void connect() {
+        if (!isAllowConnect) {
+            return;
+        }
+        isAllowConnect = false;
+        if (isConnected()) {
+            return;
+        }
+        isDisconnecting = false;
+
+        if (ipConfig == null) {
+            throw new RuntimeException(new RuntimeException("IpConfig参数不能为空！"));
+        }
+
+        if (reconnectManager != null) {
+            reconnectManager.detach();
+            XLog.i("ReconnectionManager is detached.");
+        }
+        reconnectManager = options.getReconnectionManager();
+        if (reconnectManager != null) {
+            reconnectManager.attach(this);
+            XLog.i("ReconnectionManager is attached.");
+        }
+
+
         connectThread = new ConnectThread(" Connect thread for ");
         connectThread.setDaemon(true);
         connectThread.start();
@@ -56,40 +83,37 @@ public class ConnectManagerImp implements IConnectManager {
 
         @Override
         public void run() {
-            if (ipConfig != null) {
-
-                int TIME_OUT = 60 * 1000;
-                try {
-                    socket = new Socket();
+            int TIME_OUT = 60 * 1000;
+            try {
+                socket = new Socket();
 
 //                    socket.setReuseAddress(true);//复用端口
 //                    socket.setKeepAlive(true);
 //                    socket.setSoTimeout(TIME_OUT);
 
-                    SocketAddress socketAddress = new InetSocketAddress(ipConfig.ip, ipConfig.port);
+                SocketAddress socketAddress = new InetSocketAddress(ipConfig.ip, ipConfig.port);
 
 //                     socket.bind(socketAddress);
 //
-                    socket.connect(socketAddress, TIME_OUT);
+                socket.connect(socketAddress, TIME_OUT);
 
-                    XLog.e("Start connect: " + ipConfig.ip + ":" + ipConfig.port + " socket server...");
-                    //关闭Nagle算法,无论TCP数据报大小,立即发送
-                    socket.setTcpNoDelay(true);
+                XLog.e("Start connect: " + ipConfig.ip + ":" + ipConfig.port + " socket server...");
+                //关闭Nagle算法,无论TCP数据报大小,立即发送
+                socket.setTcpNoDelay(true);
 
-                    InputStream inputStream = socket.getInputStream();
-                    OutputStream outputStream = socket.getOutputStream();
+                InputStream inputStream = socket.getInputStream();
+                OutputStream outputStream = socket.getOutputStream();
 
-                    ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
-                    ioThreadManager.start();
+                ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
+                ioThreadManager.start();
 
-                    dispatchAction(ActionType.ACTION_CONNECT_SUCCESS);
+                dispatchAction(ActionType.ACTION_CONNECT_SUCCESS);
 
-                } catch (Exception e) {
-                    dispatchAction(ActionType.ACTION_CONNECT_FAIL, new ActionBean(e));
-                    e.printStackTrace();
-                }
-            } else {
-                dispatchAction(ActionType.ACTION_CONNECT_FAIL, new ActionBean(new RuntimeException("ip参数不能为空！")));
+            } catch (Exception e) {
+                dispatchAction(ActionType.ACTION_CONNECT_FAIL, new ActionBean(e));
+                e.printStackTrace();
+            } finally {
+                isAllowConnect = true;
             }
         }
     }
@@ -113,6 +137,13 @@ public class ConnectManagerImp implements IConnectManager {
                 return;
             }
             isDisconnecting = true;
+        }
+
+        if (e instanceof ManualCloseException) {
+            if (reconnectManager != null) {
+                reconnectManager.detach();
+                XLog.i("ReconnectionManager is detached.");
+            }
         }
 
         DisconnectThread disconnectThread = new DisconnectThread(e, " Connect thread for ");
@@ -156,7 +187,8 @@ public class ConnectManagerImp implements IConnectManager {
 
             } finally {
                 isDisconnecting = false;
-//                isConnectionPermitted = true;
+                isAllowConnect = true;
+
 //                if (!(mException instanceof UnConnectException) && mSocket != null) {
 //                    mException = mException instanceof ManualCloseException ? null : mException;
                 dispatchAction(ActionType.ACTION_DISCONNECT, new ActionBean(mException));
@@ -188,14 +220,18 @@ public class ConnectManagerImp implements IConnectManager {
         return isDisconnecting;
     }
 
+    @Override
+    public IActionDispatcher getActionDispatcher(){
+        return actionDispatcher;
+    }
 
     @Override
-    public void registerActionListener(IClientActionListener listener) {
+    public void registerSocketListener(ISocketListener listener) {
         actionDispatcher.registerClientActionListener(listener);
     }
 
     @Override
-    public void unRegisterActionListener(IClientActionListener listener) {
+    public void unRegisterSocketListener(ISocketListener listener) {
         actionDispatcher.unRegisterClientActionListener(listener);
     }
 
@@ -206,6 +242,7 @@ public class ConnectManagerImp implements IConnectManager {
     void dispatchAction(int action, ActionBean actionBean) {
         actionDispatcher.dispatch(action, actionBean);
     }
+
 
 
 }

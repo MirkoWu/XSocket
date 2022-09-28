@@ -2,7 +2,7 @@ package com.mirkowu.xsocket.core.listener;
 
 import com.mirkowu.xsocket.core.IPConfig;
 
-public interface IClientActionListener extends IConnectStatusListener {
+public interface ISocketListener extends IConnectStatusListener {
 
     void onSend(IPConfig config,byte[] bytes);
 
