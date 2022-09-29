@@ -8,13 +8,14 @@ import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
+import com.mirkowu.xsocket.core.listener.IRegister;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 
-public class ActionDispatcher implements IActionDispatcher {
+public class ActionDispatcher implements IActionDispatcher , IRegister<ISocketListener> {
 
     //    private static class Holder {
 //        public static HandleDispatcher INSTANCE = new HandleDispatcher();
@@ -45,13 +46,14 @@ public class ActionDispatcher implements IActionDispatcher {
 //        }
     };
 
-    public void registerClientActionListener(ISocketListener listener) {
+    @Override
+    public void registerSocketListener(ISocketListener listener) {
         if (listener != null && !listenerList.contains(listener)) {
             listenerList.add(listener);
         }
     }
-
-    public void unRegisterClientActionListener(ISocketListener listener) {
+    @Override
+    public void unRegisterSocketListener(ISocketListener listener) {
         if (listenerList.contains(listener)) {
             listenerList.remove(listener);
         }

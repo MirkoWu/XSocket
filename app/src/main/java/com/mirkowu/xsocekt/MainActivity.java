@@ -10,6 +10,9 @@ import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.client.XSocket;
+import com.mirkowu.xsocket.core.listener.IServerSocketListener;
+import com.mirkowu.xsocket.core.server.IClient;
+import com.mirkowu.xsocket.core.server.IClientPool;
 import com.mirkowu.xsocket.core.server.IServerManager;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 
@@ -26,6 +29,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickServer(View view) {
         serverManager = new XSocket().getServer(8888);
+        serverManager.registerSocketListener(new IServerSocketListener() {
+            @Override
+            public void onServerListening(int serverPort) {
+                XLog.e("server  , onServerListening :" + serverPort);
+            }
+
+            @Override
+            public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
+                XLog.e("server  , onClientConnected :" +client.getHostName()+":"+ serverPort );
+            }
+
+            @Override
+            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool) {
+                XLog.e("server  , onClientDisconnected :" +client.getHostName()+":"+ serverPort );
+            }
+
+            @Override
+            public void onServerAlreadyShutdown(int serverPort) {
+                XLog.e("server  , onServerListening :" + serverPort);
+
+            }
+        });
         serverManager.listen();
     }
 
@@ -40,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickConnect(View view) {
         manager = new XSocket().connect("127.0.0.1", 8888);
-        manager.connect();
         manager.registerSocketListener(new ISocketListener() {
 
             @Override
@@ -73,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 XLog.e("onReConnect");
             }
         });
+        manager.connect();
+
     }
 
     public void clickSend(View view) {

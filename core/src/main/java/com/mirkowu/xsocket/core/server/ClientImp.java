@@ -81,8 +81,11 @@ public class ClientImp extends AbsClient {
         if (isDead) {
             return;
         }
-        clientPool.cache(this);
+        if (clientPool!=null) {
+            clientPool.cache(this);
 
+        }
+dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
     }
 
     @Override
@@ -100,7 +103,10 @@ public class ClientImp extends AbsClient {
         }
         disconnect(e);
 
-        isDead = false;
+        isDea= false;
+
+        dispatcher.dispatch(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED);
+
     }
 
     @Override

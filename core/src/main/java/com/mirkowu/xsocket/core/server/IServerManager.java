@@ -1,6 +1,9 @@
 package com.mirkowu.xsocket.core.server;
 
-public interface IServerManager {
+import com.mirkowu.xsocket.core.listener.IRegister;
+import com.mirkowu.xsocket.core.listener.IServerSocketListener;
+
+public interface IServerManager extends IRegister<IServerSocketListener> {
     void listen();
 
     boolean isLive();

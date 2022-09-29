@@ -3,7 +3,9 @@ package com.mirkowu.xsocket.core.action;
 
 
 public class ActionBean {
+    public int action;
     public Object data;
+    public Object args2;
   //  public volatile ISocketListener listener;
 
     public ActionBean() {
@@ -13,4 +15,8 @@ public class ActionBean {
         this.data = data;
     }
 
+    public ActionBean(Object data, Object args2) {
+        this.data = data;
+        this.args2 = args2;
+    }
 }

@@ -4,30 +4,33 @@ import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.LoopThread;
+import com.mirkowu.xsocket.core.listener.IActionRegister;
 import com.mirkowu.xsocket.core.listener.IRegister;
+import com.mirkowu.xsocket.core.listener.IServerSocketListener;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerManagerImp implements IServerManager, IRegister<IServerActionDispatcher> {
+public class ServerManagerImp implements IServerManager{
     private ServerSocket mServerSocket;
     private AcceptThread mAcceptThread;
     private ServerOptions mServerOptions;
     private ClientPoolImp clientPoolImp;
     private volatile boolean isInit = false;
-    private IServerActionDispatcher actionDispatcher;
-    private int  mServerPort;
+    private ServerActionDispatcher actionDispatcher;
+    private int mServerPort;
 
-    public ServerManagerImp(int serverPort,ServerOptions serverOptions) {
-        this.mServerPort=serverPort;
-        this.mServerOptions=serverOptions;
+    public ServerManagerImp(int serverPort, ServerOptions serverOptions) {
+        this.mServerPort = serverPort;
+        this.mServerOptions = serverOptions;
         actionDispatcher = new ServerActionDispatcher(this);
+        actionDispatcher.setServerPort(serverPort);
     }
 
     @Override
     public void listen() {
-       // if(mServerPort)
+        // if(mServerPort)
 
         if (mServerOptions == null) {
             throw new IllegalArgumentException("option can not be null");
@@ -59,22 +62,22 @@ public class ServerManagerImp implements IServerManager, IRegister<IServerAction
 
     }
 
-    @Override
-    public void registerSocketListener(IServerActionDispatcher listener) {
-        actionDispatcher.registerSocketListener(listener);
-    }
-
-    @Override
-    public void unRegisterSocketListener(IServerActionDispatcher listener) {
-        actionDispatcher.unRegisterSocketListener(listener);
-    }
-
     public void dispatchAction(int action) {
         actionDispatcher.dispatch(action);
     }
 
     public void dispatchAction(int action, ActionBean actionBean) {
         actionDispatcher.dispatch(action, actionBean);
+    }
+
+    @Override
+    public void registerSocketListener(IServerSocketListener listener) {
+        actionDispatcher.registerSocketListener(listener);
+    }
+
+    @Override
+    public void unRegisterSocketListener(IServerSocketListener listener) {
+        actionDispatcher.unRegisterSocketListener(listener);
     }
 
 
@@ -88,7 +91,8 @@ public class ServerManagerImp implements IServerManager, IRegister<IServerAction
         protected void onLoopStart() {
             XLog.e("Server onLoopStart");
             clientPoolImp = new ClientPoolImp(mServerOptions.getMaxConnectCapacity());
-
+            actionDispatcher.setClientPool(clientPoolImp);
+            dispatchAction(ServerActionType.Server.ACTION_LISTENING);
         }
 
         @Override
@@ -133,6 +137,6 @@ public class ServerManagerImp implements IServerManager, IRegister<IServerAction
         mAcceptThread.shutdown(new ManualCloseException());
         mAcceptThread = null;
 
-//        sendBroadcast(IAction.Server.ACTION_SERVER_ALLREADY_SHUTDOWN);
+       dispatchAction(ServerActionType.Server.ACTION_ALREADY_SHUTDOWN);
     }
 }

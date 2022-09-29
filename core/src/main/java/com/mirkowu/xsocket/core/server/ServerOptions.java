@@ -7,7 +7,10 @@ import java.nio.ByteOrder;
 
 public class ServerOptions implements IIOCoreOptions{
 
-
+    @Override
+    public int getMaxConnectCapacity() {
+        return 10;
+    }
 
     @Override
     public ISender getSender() {

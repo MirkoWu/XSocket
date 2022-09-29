@@ -25,6 +25,7 @@ public interface IIOCoreOptions {
     int getWritePackageBytes();
 
     boolean isDebug();
+
     int getMaxConnectCapacity();
 
 }

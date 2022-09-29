@@ -21,19 +21,15 @@ import java.net.SocketAddress;
 public class ConnectManagerImp implements IConnectManager {
 
     // ISocket socket;
-    IPConfig ipConfig;
-
-
-    Options options;
-    Socket socket;
-    volatile boolean isDisconnecting = false;
-    volatile boolean isAllowConnect = true;
-    IOThreadManager ioThreadManager;
-    ConnectThread connectThread;
-
-    ActionDispatcher actionDispatcher;
-
-    AbsReconnectionManager reconnectManager;
+  private  IPConfig ipConfig;
+  private  Options options;
+  private  Socket socket;
+  private  volatile boolean isDisconnecting = false;
+  private  volatile boolean isAllowConnect = true;
+  private  IOThreadManager ioThreadManager;
+  private  ConnectThread connectThread;
+  private  ActionDispatcher actionDispatcher;
+  private  AbsReconnectionManager reconnectManager;
 
     public ConnectManagerImp(IPConfig config) {
         this(config, Options.defaultOptions());
@@ -230,12 +226,12 @@ public class ConnectManagerImp implements IConnectManager {
 
     @Override
     public void registerSocketListener(ISocketListener listener) {
-        actionDispatcher.registerClientActionListener(listener);
+        actionDispatcher.registerSocketListener(listener);
     }
 
     @Override
     public void unRegisterSocketListener(ISocketListener listener) {
-        actionDispatcher.unRegisterClientActionListener(listener);
+        actionDispatcher.unRegisterSocketListener(listener);
     }
 
     void dispatchAction(int action) {
