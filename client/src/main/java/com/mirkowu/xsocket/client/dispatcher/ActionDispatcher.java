@@ -1,14 +1,13 @@
-package com.mirkowu.xsocket.core.action;
+package com.mirkowu.xsocket.client.dispatcher;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 
-import androidx.annotation.NonNull;
-
-import com.mirkowu.xsocket.core.IConnectManager;
-import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.listener.ISocketListener;
+import com.mirkowu.xsocket.client.connect.IConnectManager;
+import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.client.listener.ISocketListener;
+import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.ActionType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,37 +37,13 @@ public class ActionDispatcher implements IActionDispatcher {
     }
 
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            int action = msg.arg1;
-            ActionBean bean = (ActionBean) msg.obj;
-            handleAction(action, bean, bean.listener);
-        }
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            int action = msg.arg1;
+//            ActionBean bean = (ActionBean) msg.obj;
+//            handleAction(action, bean, bean.listener);
+//        }
     };
-
-    private void handleAction(int action, ActionBean bean, ISocketListener listener) {
-        switch (action) {
-            case ActionType.ACTION_SEND:
-                listener.onSend(ipConfig, (byte[]) bean.data);
-                break;
-            case ActionType.ACTION_RECEIVE:
-                listener.onReceive(ipConfig, (byte[]) bean.data);
-                break;
-            case ActionType.ACTION_CONNECT_SUCCESS:
-                listener.onConnectSuccess(ipConfig);
-                break;
-            case ActionType.ACTION_CONNECT_FAIL:
-                listener.onConnectFail(ipConfig, (Exception) bean.data);
-                break;
-            case ActionType.ACTION_DISCONNECT:
-                listener.onDisConnect(ipConfig, (Exception) bean.data);
-                break;
-            case ActionType.ACTION_RECONNECT:
-                listener.onReconnect(ipConfig);
-                break;
-        }
-    }
-
 
     public void registerClientActionListener(ISocketListener listener) {
         if (listener != null && !listenerList.contains(listener)) {
@@ -101,7 +76,7 @@ public class ActionDispatcher implements IActionDispatcher {
 
     public synchronized void dispatchActionToListener(int action, ActionBean bean, ISocketListener listener) {
         if (bean == null) bean = new ActionBean();
-        bean.listener = listener;
+       // bean.listener = listener;
 
 //        Message message = Message.obtain();
 //        message.arg1 = action;
@@ -114,6 +89,30 @@ public class ActionDispatcher implements IActionDispatcher {
                 handleAction(action, finalBean, listener);
             }
         });
+    }
+
+
+    private void handleAction(int action, ActionBean bean, ISocketListener listener) {
+        switch (action) {
+            case ActionType.ACTION_SEND:
+                listener.onSend(ipConfig, (byte[]) bean.data);
+                break;
+            case ActionType.ACTION_RECEIVE:
+                listener.onReceive(ipConfig, (byte[]) bean.data);
+                break;
+            case ActionType.ACTION_CONNECT_SUCCESS:
+                listener.onConnectSuccess(ipConfig);
+                break;
+            case ActionType.ACTION_CONNECT_FAIL:
+                listener.onConnectFail(ipConfig, (Exception) bean.data);
+                break;
+            case ActionType.ACTION_DISCONNECT:
+                listener.onDisConnect(ipConfig, (Exception) bean.data);
+                break;
+            case ActionType.ACTION_RECONNECT:
+                listener.onReconnect(ipConfig);
+                break;
+        }
     }
 
 

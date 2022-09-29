@@ -1,7 +1,7 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client.connect;
 
-import android.os.Bundle;
-
+import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.core.io.IOThreadMode;
 
 import java.util.HashMap;

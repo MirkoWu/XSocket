@@ -1,7 +1,7 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client.connect;
 
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
-import com.mirkowu.xsocket.core.listener.ISocketListener;
+import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.listener.IRegister;
 
 public interface IConnectManager extends IRegister<ISocketListener> {

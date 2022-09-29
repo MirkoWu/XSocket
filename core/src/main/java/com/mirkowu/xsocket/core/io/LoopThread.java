@@ -43,7 +43,7 @@ public abstract class LoopThread implements Runnable {
         shutdown();
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         isRunning = false;
         if (coreThread != null) {
             try {

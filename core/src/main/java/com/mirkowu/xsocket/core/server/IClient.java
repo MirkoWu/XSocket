@@ -6,11 +6,17 @@ import com.mirkowu.xsocket.core.ISendable;
 
 public interface IClient extends IConnectable, IDisconnectable {
 
-   String  getIp();
+    String getHostIp();
 
-   String getHostName();
+    int getHostPort();
 
-   String getUniqueTag();
+    String getHostName();
+
+    String getUniqueTag();
 
     void send(byte[] bytes);
+
+    void addClientIOListener(IClientIOListener listener);
+    void removeClientIOListener(IClientIOListener listener);
+    void removeAllClientIOListener();
 }

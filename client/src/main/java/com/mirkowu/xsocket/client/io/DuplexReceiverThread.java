@@ -1,9 +1,8 @@
-package com.mirkowu.xsocket.core.client;
+package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.core.action.ActionBean;
-import com.mirkowu.xsocket.core.action.ActionDispatcher;
+import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.XLog;

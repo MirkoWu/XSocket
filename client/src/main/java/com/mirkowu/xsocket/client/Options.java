@@ -1,5 +1,9 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client;
 
+import com.mirkowu.xsocket.client.connect.AbsReconnectionManager;
+import com.mirkowu.xsocket.client.connect.DefaultReconnectManager;
+import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.io.IOThreadMode;
 
 public class Options {

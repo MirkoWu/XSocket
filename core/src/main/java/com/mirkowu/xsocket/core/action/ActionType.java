@@ -7,4 +7,6 @@ public interface ActionType {
     int ACTION_CONNECT_FAIL = 4;
     int ACTION_DISCONNECT = 5;
     int ACTION_RECONNECT = 6;
+
+
 }

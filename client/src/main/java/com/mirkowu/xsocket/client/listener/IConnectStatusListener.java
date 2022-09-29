@@ -1,6 +1,7 @@
-package com.mirkowu.xsocket.core.listener;
+package com.mirkowu.xsocket.client.listener;
 
-import com.mirkowu.xsocket.core.IPConfig;
+
+import com.mirkowu.xsocket.client.IPConfig;
 
 public interface IConnectStatusListener {
     void onConnectSuccess(IPConfig config);

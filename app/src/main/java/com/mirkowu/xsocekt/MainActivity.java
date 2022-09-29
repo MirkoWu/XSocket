@@ -5,11 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.mirkowu.xsocket.core.IConnectManager;
-import com.mirkowu.xsocket.core.IPConfig;
+import com.mirkowu.xsocket.client.connect.IConnectManager;
+import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.XLog;
-import com.mirkowu.xsocket.core.XSocket;
-import com.mirkowu.xsocket.core.listener.ISocketListener;
+import com.mirkowu.xsocket.client.XSocket;
 import com.mirkowu.xsocket.core.server.IServerManager;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 
@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
     IServerManager serverManager;
 
     public void clickServer(View view) {
-        serverManager = new XSocket().startServer();
-        serverManager.start();
+        serverManager = new XSocket().getServer(8888);
+        serverManager.listen();
     }
 
 

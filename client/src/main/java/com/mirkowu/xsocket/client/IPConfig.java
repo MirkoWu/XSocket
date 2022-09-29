@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client;
 
 import android.text.TextUtils;
 

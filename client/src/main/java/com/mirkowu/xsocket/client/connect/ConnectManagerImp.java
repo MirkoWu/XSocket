@@ -1,12 +1,15 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client.connect;
 
+import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.client.dispatcher.ActionDispatcher;
+import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.client.io.IOThreadManager;
+import com.mirkowu.xsocket.client.listener.ISocketListener;
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
-import com.mirkowu.xsocket.core.client.IOThreadManager;
-import com.mirkowu.xsocket.core.action.ActionDispatcher;
-import com.mirkowu.xsocket.core.listener.ISocketListener;
 
 import java.io.IOException;
 import java.io.InputStream;

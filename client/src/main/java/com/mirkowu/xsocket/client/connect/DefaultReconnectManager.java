@@ -1,5 +1,6 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.client.connect;
 
+import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.LoopThread;
