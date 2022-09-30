@@ -30,7 +30,6 @@ public class SenderImp implements ISender {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw e;
-
             }
         }
 

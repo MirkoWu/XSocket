@@ -1,7 +1,7 @@
 package com.mirkowu.xsocket.client.connect;
 
 import com.mirkowu.xsocket.client.IPConfig;
-import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 
 import java.util.LinkedHashSet;

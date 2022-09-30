@@ -1,7 +1,10 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.client;
 
 import android.text.TextUtils;
 
+
+import com.mirkowu.xsocket.core.server.IClientSocketListener;
+import com.mirkowu.xsocket.core.server.ServerOptions;
 
 import java.net.InetAddress;
 import java.net.Socket;

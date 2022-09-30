@@ -27,10 +27,14 @@ public class ReceiverImp implements IReceiver {
 //        }
         try {
             bos.reset();
-            int len= inputStream.read(recBuffer);
-            bos.write(recBuffer, 0, len);
-            byte[] data = bos.toByteArray();
-            return data;
+            int len = inputStream.read(recBuffer);
+            if (len != -1) {
+                bos.write(recBuffer, 0, len);
+                byte[] data = bos.toByteArray();
+                return data;
+            }else {
+                throw new IOException("");
+            }
         } catch (IOException e) {
             e.printStackTrace();
             throw e;

@@ -91,7 +91,7 @@ public class DefaultReconnectManager extends AbsReconnectionManager {
 
             if (!mConnectManager.isConnected()) {
                 if (dispatcher != null) {
-                    dispatcher.dispatch(ActionType.ACTION_RECONNECT);
+                    dispatcher.dispatchAction(ActionType.ACTION_RECONNECT);
                 }
 
                 mConnectManager.connect();

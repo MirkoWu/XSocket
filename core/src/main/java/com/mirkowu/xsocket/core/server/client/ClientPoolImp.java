@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.client;
 
 import com.mirkowu.xsocket.core.exception.CacheException;
 
@@ -23,6 +23,12 @@ public class ClientPoolImp extends AbsClientPool<String, IClient> implements ICl
     public int size() {
         return super.size();
     }
+
+    @Override
+    public boolean isFull() {
+        return super.isFull();
+    }
+
 
     public void unCache(IClient iClient) {
         remove(iClient.getUniqueTag());

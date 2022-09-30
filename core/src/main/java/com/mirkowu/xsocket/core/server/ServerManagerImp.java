@@ -2,17 +2,22 @@ package com.mirkowu.xsocket.core.server;
 
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.LoopThread;
-import com.mirkowu.xsocket.core.listener.IActionRegister;
-import com.mirkowu.xsocket.core.listener.IRegister;
 import com.mirkowu.xsocket.core.listener.IServerSocketListener;
+import com.mirkowu.xsocket.core.server.action.ServerActionDispatcher;
+import com.mirkowu.xsocket.core.server.action.ServerActionType;
+import com.mirkowu.xsocket.core.server.client.ClientImp;
+import com.mirkowu.xsocket.core.server.client.ClientPoolImp;
+import com.mirkowu.xsocket.core.server.client.IClient;
+import com.mirkowu.xsocket.core.server.client.IClientPool;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerManagerImp implements IServerManager{
+public class ServerManagerImp implements IServerManager, IActionDispatcher {
     private ServerSocket mServerSocket;
     private AcceptThread mAcceptThread;
     private ServerOptions mServerOptions;
@@ -41,14 +46,14 @@ public class ServerManagerImp implements IServerManager{
             configuration(mServerSocket);
             mAcceptThread = new AcceptThread("server accepting in ");
             mAcceptThread.start();
-        } catch (IOException e) {
-            shutdown();
+        } catch (Exception e) {
+            shutdown(e);
         }
     }
 
     @Override
     public boolean isLive() {
-        return mServerSocket != null && mServerSocket.isClosed()
+        return mServerSocket != null && !mServerSocket.isClosed()
                 && mAcceptThread != null && mAcceptThread.isRunning();
     }
 
@@ -62,13 +67,16 @@ public class ServerManagerImp implements IServerManager{
 
     }
 
+    @Override
     public void dispatchAction(int action) {
-        actionDispatcher.dispatch(action);
+        actionDispatcher.dispatchAction(action);
     }
 
-    public void dispatchAction(int action, ActionBean actionBean) {
-        actionDispatcher.dispatch(action, actionBean);
+    @Override
+    public void dispatchAction(int action, ActionBean bean) {
+        actionDispatcher.dispatchAction(action, bean);
     }
+
 
     @Override
     public void registerSocketListener(IServerSocketListener listener) {
@@ -89,54 +97,54 @@ public class ServerManagerImp implements IServerManager{
 
         @Override
         protected void onLoopStart() {
-            XLog.e("Server onLoopStart");
             clientPoolImp = new ClientPoolImp(mServerOptions.getMaxConnectCapacity());
             actionDispatcher.setClientPool(clientPoolImp);
-            dispatchAction(ServerActionType.Server.ACTION_LISTENING);
+            dispatchAction(ServerActionType.Server.ACTION_SERVER_LISTENING);
         }
 
         @Override
-        protected void onLoopExec() {
-            try {
-                Socket socket = mServerSocket.accept();
+        protected void onLoopExec() throws Exception {
+            Socket socket = mServerSocket.accept();
+            ClientImp client = new ClientImp(socket, mServerOptions, clientPoolImp, ServerManagerImp.this);
+            //clientPoolImp.cache(client);
 
-                ClientImp client = new ClientImp(socket, mServerOptions);
-                client.startSendThread();
-
-                XLog.e("Server client accept :" + socket.getLocalAddress().getHostAddress());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            client.startSendThread();
         }
 
         @Override
         protected void onLoopEnd(Exception e) {
-            String msg = e != null ? e.toString() : "null";
-            XLog.e("Server onLoopEnd :" + msg);
-
+          //  shutdown(e);
+            //   dispatchAction(ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN, new ActionBean(e));
         }
     }
 
     @Override
     public void shutdown() {
-        if (mServerSocket == null) {
-            return;
+        shutdown(new ManualCloseException());
+    }
+
+
+    private void shutdown(Exception e) {
+        if (mServerSocket == null && e instanceof ManualCloseException) {
+            e = new IllegalStateException("ServerSocket already shutdown!");
         }
 
         if (clientPoolImp != null) {
             clientPoolImp.serverShutdown();
         }
-
         try {
-            mServerSocket.close();
-        } catch (IOException e) {
+            if (mServerSocket != null) {
+                mServerSocket.close();
+            }
+        } catch (IOException e1) {
         }
-
         mServerSocket = null;
         clientPoolImp = null;
-        mAcceptThread.shutdown(new ManualCloseException());
-        mAcceptThread = null;
+        if (mAcceptThread != null) {
+            mAcceptThread.shutdown(e);
+            mAcceptThread = null;
+        }
 
-       dispatchAction(ServerActionType.Server.ACTION_ALREADY_SHUTDOWN);
+        dispatchAction(ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN, new ActionBean(e));
     }
 }

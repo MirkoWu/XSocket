@@ -1,7 +1,7 @@
 package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.core.action.ActionBean;
-import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 import com.mirkowu.xsocket.core.IReceiver;
@@ -31,11 +31,11 @@ public class SimplexThread extends LoopThread {
     protected void onLoopExec() throws Exception{
         if (sender != null) {
             boolean result = sender.send();
-            dispatcher.dispatch(ActionType.ACTION_SEND);
+            dispatcher.dispatchAction(ActionType.ACTION_SEND);
             if (result) {
                 if (receiver != null) {
                     byte[] data = receiver.receive();
-                    dispatcher.dispatch(ActionType.ACTION_RECEIVE, new ActionBean(data));
+                    dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(data));
                     XLog.e(getClass().getSimpleName() + " receiver :" + ByteUtils.bytes2String(data));
 
                 }

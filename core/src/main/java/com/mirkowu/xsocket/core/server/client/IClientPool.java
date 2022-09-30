@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.client;
 
 public interface IClientPool<K,V> {
 
@@ -8,6 +8,8 @@ public interface IClientPool<K,V> {
     V findByUniqueTag(K key);
 
     int size();
+
+    boolean isFull();
 
     void sendToAll(byte[] bytes);
 }

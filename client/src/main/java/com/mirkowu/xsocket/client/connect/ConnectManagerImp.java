@@ -4,7 +4,7 @@ import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.client.dispatcher.ActionDispatcher;
-import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.client.io.IOThreadManager;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.XLog;
@@ -235,11 +235,11 @@ public class ConnectManagerImp implements IConnectManager {
     }
 
     void dispatchAction(int action) {
-        actionDispatcher.dispatch(action);
+        actionDispatcher.dispatchAction(action);
     }
 
     void dispatchAction(int action, ActionBean actionBean) {
-        actionDispatcher.dispatch(action, actionBean);
+        actionDispatcher.dispatchAction(action, actionBean);
     }
 
 

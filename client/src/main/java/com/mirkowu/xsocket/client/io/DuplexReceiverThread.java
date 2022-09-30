@@ -1,7 +1,7 @@
 package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.core.action.ActionBean;
-import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 import com.mirkowu.xsocket.core.IReceiver;
@@ -28,9 +28,7 @@ public class DuplexReceiverThread extends LoopThread {
     @Override
     protected void onLoopExec() throws Exception {
         byte[] data = receiver.receive();
-
-        dispatcher.dispatch(ActionType.ACTION_RECEIVE, new ActionBean(data));
-        XLog.e(getClass().getSimpleName() + " receiver :" + ByteUtils.bytes2String(data));
+        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(data));
     }
 
     @Override
@@ -45,5 +43,6 @@ public class DuplexReceiverThread extends LoopThread {
             receiver.close();
         }
         super.shutdown();
+        XLog.e("DuplexReceiverThread shutdown :" + (isRunning == false));
     }
 }

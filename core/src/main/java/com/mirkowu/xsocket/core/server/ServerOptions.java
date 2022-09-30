@@ -9,7 +9,7 @@ public class ServerOptions implements IIOCoreOptions{
 
     @Override
     public int getMaxConnectCapacity() {
-        return 10;
+        return 2;
     }
 
     @Override

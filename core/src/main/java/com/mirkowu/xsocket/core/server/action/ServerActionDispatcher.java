@@ -1,25 +1,30 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.action;
 
 import android.os.Handler;
 import android.os.Looper;
 
-import static com.mirkowu.xsocket.core.server.ServerActionType.Server.ACTION_ALREADY_SHUTDOWN;
-import static com.mirkowu.xsocket.core.server.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
-import static com.mirkowu.xsocket.core.server.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
-import static com.mirkowu.xsocket.core.server.ServerActionType.Server.ACTION_LISTENING;
-import static com.mirkowu.xsocket.core.server.ServerActionType.Server.ACTION_WILL_SHUTDOWN;
+import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN;
+import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
+import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
+import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_LISTENING;
+import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN;
 
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
 import com.mirkowu.xsocket.core.listener.IRegister;
 import com.mirkowu.xsocket.core.listener.IServerSocketListener;
+import com.mirkowu.xsocket.core.server.client.IClient;
+import com.mirkowu.xsocket.core.server.client.IClientPool;
+import com.mirkowu.xsocket.core.server.IServerManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ServerActionDispatcher implements IServerActionDispatcher, IRegister<IServerSocketListener> {
+public class ServerActionDispatcher implements IActionDispatcher, IRegister<IServerSocketListener> {
     /**
      * 事件消费队列
      */
@@ -84,7 +89,7 @@ public class ServerActionDispatcher implements IServerActionDispatcher, IRegiste
     }
 
     @Override
-    public void dispatch(int action, ActionBean bean) {
+    public void dispatchAction(int action, ActionBean bean) {
         if (bean == null) bean = new ActionBean();
         bean.action = action;
         bean.args2 = this;
@@ -92,37 +97,40 @@ public class ServerActionDispatcher implements IServerActionDispatcher, IRegiste
     }
 
     @Override
-    public void dispatch(int action) {
-        dispatch(action, null);
+    public void dispatchAction(int action) {
+        dispatchAction(action, null);
     }
 
     private void dispatchActionToListener(int action, ActionBean bean, IServerSocketListener listener) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                handleAction(action, bean, listener);
-            }
-        });
+//        mHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+        handleAction(action, bean, listener);
+//            }
+//        });
     }
 
     private void handleAction(int action, ActionBean bean, IServerSocketListener listener) {
-        switch (action) {
-            case ACTION_LISTENING:
-                listener.onServerListening(mServerPort);
-                break;
-            case ACTION_CLIENT_CONNECTED:
-                listener.onClientConnected((IClient) bean.data, mServerPort, mClientPool);
-                break;
-            case ACTION_CLIENT_DISCONNECTED:
-                listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool);
-                break;
-            case ACTION_WILL_SHUTDOWN:
-//                listener.
-                break;
-            case ACTION_ALREADY_SHUTDOWN:
-                listener.onServerAlreadyShutdown(mServerPort);
-                break;
-
+        try {
+            switch (action) {
+                case ACTION_SERVER_LISTENING:
+                    listener.onServerListening(mServerPort);
+                    break;
+                case ACTION_CLIENT_CONNECTED:
+                    listener.onClientConnected((IClient) bean.data, mServerPort, mClientPool);
+                    break;
+                case ACTION_CLIENT_DISCONNECTED:
+                    listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool);
+                    break;
+                case ACTION_SERVER_WILL_SHUTDOWN:
+                    listener.onServerWillBeShutdown(mServerPort, mServerManager, mClientPool, (Throwable) bean.data);
+                    break;
+                case ACTION_SERVER_ALREADY_SHUTDOWN:
+                    listener.onServerAlreadyShutdown(mServerPort, (Throwable) bean.data);
+                    break;
+            }
+        } catch (Exception e) {
+            XLog.e("ServerActionDispatcher handleAction  error:" +e.toString());
         }
     }
 

@@ -1,31 +1,34 @@
 package com.mirkowu.xsocket.core.server.io;
 
 import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.action.ActionType;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
-import com.mirkowu.xsocket.core.server.IServerActionDispatcher;
 
 public class ClientSendThread extends LoopThread {
-  private ISender sender;
-  private IServerActionDispatcher dispatcher;
+    private ISender sender;
+    private IActionDispatcher dispatcher;
 
-    public ClientSendThread(ISender sender, IServerActionDispatcher dispatcher) {
-       super("server_client_send_thread");
-       this.sender = sender;
+    public ClientSendThread(ISender sender, IActionDispatcher dispatcher) {
+        super("server_client_send_thread");
+        this.sender = sender;
         this.dispatcher = dispatcher;
     }
 
     @Override
     protected void onLoopStart() {
-
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_START);
     }
 
     @Override
     protected void onLoopExec() throws Exception {
-sender.send();
+        sender.send();
+        dispatcher.dispatchAction(ActionType.ACTION_SEND,null);
     }
 
     @Override
     protected void onLoopEnd(Exception e) {
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN);
 
     }
 

@@ -11,18 +11,21 @@ import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.client.XSocket;
 import com.mirkowu.xsocket.core.listener.IServerSocketListener;
-import com.mirkowu.xsocket.core.server.IClient;
-import com.mirkowu.xsocket.core.server.IClientPool;
+import com.mirkowu.xsocket.core.server.IShutdown;
+import com.mirkowu.xsocket.core.server.client.IClient;
+import com.mirkowu.xsocket.core.server.client.IClientIOListener;
+import com.mirkowu.xsocket.core.server.client.IClientPool;
 import com.mirkowu.xsocket.core.server.IServerManager;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IClientIOListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        XSocket.setDebug(true);
     }
 
     IServerManager serverManager;
@@ -37,23 +40,46 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
-                XLog.e("server  , onClientConnected :" +client.getHostName()+":"+ serverPort );
+
+                XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
+
+             //   client.addClientIOListener(MainActivity.this);
+
+                client.send(("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes());
+
             }
+
 
             @Override
             public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool) {
-                XLog.e("server  , onClientDisconnected :" +client.getHostName()+":"+ serverPort );
+                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort);
             }
 
             @Override
-            public void onServerAlreadyShutdown(int serverPort) {
-                XLog.e("server  , onServerListening :" + serverPort);
+            public void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Throwable e) {
+                XLog.e("server  , onServerWillBeShutdown :" + serverPort + (e != null ? e.toString() : "null"));
+            }
+
+            @Override
+            public void onServerAlreadyShutdown(int serverPort,Throwable e) {
+                XLog.e("server  , onServerAlreadyShutdown :" + serverPort + (e != null ? e.toString() : "null"));
 
             }
         });
         serverManager.listen();
     }
 
+    @Override
+    public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
+        XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
+
+    }
+
+    @Override
+    public void onSendToClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
+        XLog.e("server onSendToClient :" + ByteUtils.bytes2String(bytes));
+
+    }
 
     public void clickCloseServer(View view) {
         if (serverManager != null) {
@@ -100,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         manager.connect();
 
     }
+
 
     public void clickSend(View view) {
         if (manager != null) {

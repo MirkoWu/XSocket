@@ -1,10 +1,7 @@
 package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.client.Options;
-import com.mirkowu.xsocket.client.dispatcher.IActionDispatcher;
-import com.mirkowu.xsocket.client.io.DuplexReceiverThread;
-import com.mirkowu.xsocket.client.io.DuplexSenderThread;
-import com.mirkowu.xsocket.client.io.SimplexThread;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.ReceiverImp;

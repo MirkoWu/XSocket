@@ -13,7 +13,7 @@ public abstract class LoopThread implements Runnable {
         this.threadName = threadName;
     }
 
-    public LoopThread start() {
+    public synchronized LoopThread  start() {
         if (!isRunning) {
             isRunning = true;
             coreThread = new Thread(this, threadName);
@@ -48,14 +48,14 @@ public abstract class LoopThread implements Runnable {
         if (coreThread != null) {
             try {
                 coreThread.interrupt();
-            } catch (SecurityException e) {
+            } catch (Exception e) {
             }
         }
         coreThread = null;
     }
 
 
-    public boolean isRunning(){
+    public synchronized boolean isRunning(){
         return isRunning;
     }
 

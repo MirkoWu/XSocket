@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.client;
 
 
 import java.util.Iterator;
@@ -21,7 +21,9 @@ public abstract class AbsClientPool<K, V> {
         }
         if (mCapacity == mHashMap.size()) {
             Map.Entry<K, V> entry = getTail();
-            onCacheFull(entry.getKey(), entry.getValue());
+            if (entry != null) {
+                onCacheFull(entry.getKey(), entry.getValue());
+            }
         }
 
         if (mHashMap.containsKey(key)) {
@@ -34,7 +36,7 @@ public abstract class AbsClientPool<K, V> {
         mHashMap.put(key, value);
     }
 
-     V get(K key) {
+    V get(K key) {
         return mHashMap.get(key);
     }
 
@@ -49,8 +51,12 @@ public abstract class AbsClientPool<K, V> {
         mHashMap.clear();
     }
 
-    int size() {
+    synchronized int size() {
         return mHashMap.size();
+    }
+
+    synchronized boolean isFull() {
+        return mHashMap.size() == mCapacity;
     }
 
     synchronized void echoRun(Echo echo) {

@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class XLog {
     public static final String TAG = "XSocekt";
-    public static boolean isDebug = true;
+    public static boolean isDebug = false;
 
     public static void setDebug(boolean debug) {
         isDebug = debug;
@@ -39,5 +39,7 @@ public class XLog {
     public static void e(String msg) {
         e(TAG, msg);
     }
+
+
 
 }

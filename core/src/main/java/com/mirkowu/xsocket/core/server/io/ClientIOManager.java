@@ -4,10 +4,9 @@ import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.ReceiverImp;
 import com.mirkowu.xsocket.core.SenderImp;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.IIOManager;
-import com.mirkowu.xsocket.core.server.IServerActionDispatcher;
-import com.mirkowu.xsocket.core.server.ServerActionDispatcher;
 import com.mirkowu.xsocket.core.server.ServerOptions;
 
 import java.io.InputStream;
@@ -23,13 +22,13 @@ public class ClientIOManager implements IIOManager {
 
     private ClientReceiveThread receiveThread;
     private ClientSendThread sendThread;
-    private IServerActionDispatcher dispatcher;
+    private IActionDispatcher clientActionDispatcher;
 
-    public ClientIOManager(InputStream inputStream, OutputStream outputStream, ServerOptions serverOptions, IServerActionDispatcher dispatcher) {
+    public ClientIOManager(InputStream inputStream, OutputStream outputStream, ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.serverOptions = serverOptions;
-        this.dispatcher = dispatcher;
+        this.clientActionDispatcher = clientActionDispatcher;
 
         initIO();
     }
@@ -61,7 +60,7 @@ public class ClientIOManager implements IIOManager {
             receiveThread.shutdown();
             receiveThread = null;
         }
-        receiveThread = new ClientReceiveThread(receiver, dispatcher);
+        receiveThread = new ClientReceiveThread(receiver, clientActionDispatcher);
         receiveThread.start();
     }
 
@@ -70,7 +69,8 @@ public class ClientIOManager implements IIOManager {
             sendThread.shutdown();
             sendThread = null;
         }
-        sendThread = new ClientSendThread(sender, dispatcher);
+        sendThread = new ClientSendThread(sender, clientActionDispatcher);
+        sendThread.start();
     }
 
     @Override

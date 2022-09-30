@@ -4,12 +4,17 @@ import com.mirkowu.xsocket.client.connect.CacheManager;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.server.IServerManager;
 import com.mirkowu.xsocket.core.server.ServerManagerImp;
 import com.mirkowu.xsocket.core.server.ServerOptions;
 
 public class XSocket {
 
+    public static void setDebug(boolean debug){
+        XLog.setDebug(debug);
+       // return this;
+    }
 
 
     public IConnectManager connect(String ip, int port) {

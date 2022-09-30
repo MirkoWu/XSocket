@@ -1,6 +1,11 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.core.server.client;
 
+import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.CacheException;
+import com.mirkowu.xsocket.core.server.ServerOptions;
+import com.mirkowu.xsocket.core.server.action.ClientActionDispatcher;
+import com.mirkowu.xsocket.core.server.action.ServerActionType;
 import com.mirkowu.xsocket.core.server.io.ClientIOManager;
 
 import java.io.IOException;
@@ -15,15 +20,18 @@ public class ClientImp extends AbsClient {
     private volatile boolean isReadThreadStarted;
 
     private ClientIOManager ioManager;
-    private IServerActionDispatcher dispatcher;
+    private IActionDispatcher clientActionDispatcher;
+    private IActionDispatcher serverActionDispatcher;
 
     private volatile ClientPoolImp clientPool;
 
     private volatile List<IClientIOListener> clientIOListenerList = new ArrayList<>();
 
-    public ClientImp(Socket socket, ServerOptions serverOptions) {
+    public ClientImp(Socket socket, ServerOptions serverOptions, ClientPoolImp clientPool, IActionDispatcher serverActionDispatcher) {
         super(socket, serverOptions);
-     //   dispatcher = new ServerActionDispatcher();
+        this.clientPool = clientPool;
+        this.serverActionDispatcher = serverActionDispatcher;
+        clientActionDispatcher = new ClientActionDispatcher(this);
 
         try {
             initIOManager();
@@ -36,12 +44,12 @@ public class ClientImp extends AbsClient {
     private void initIOManager() throws IOException {
         InputStream inputStream = mSocket.getInputStream();
         OutputStream outputStream = mSocket.getOutputStream();
-        ioManager = new ClientIOManager(inputStream, outputStream, mServerOptions, dispatcher);
+        ioManager = new ClientIOManager(inputStream, outputStream, mServerOptions, clientActionDispatcher);
     }
 
-    public void startSendThread(){
-        if(ioManager!=null){
-            synchronized (ioManager){
+    public void startSendThread() {
+        if (ioManager != null) {
+            synchronized (ioManager) {
                 ioManager.startSendThread();
             }
         }
@@ -81,11 +89,10 @@ public class ClientImp extends AbsClient {
         if (isDead) {
             return;
         }
-        if (clientPool!=null) {
+        if (clientPool != null) {
             clientPool.cache(this);
-
         }
-dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
+        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_CONNECTED, new ActionBean(this));
     }
 
     @Override
@@ -103,9 +110,9 @@ dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
         }
         disconnect(e);
 
-        isDea= false;
+        isDead = true;
 
-        dispatcher.dispatch(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED);
+        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED, new ActionBean(this));
 
     }
 
@@ -113,6 +120,30 @@ dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
     public void send(byte[] bytes) {
         if (ioManager != null) {
             ioManager.send(bytes);
+        }
+    }
+
+
+
+    @Override
+    public void onClientReceive(byte[] bytes) {
+        for (IClientIOListener listener : clientIOListenerList) {
+            try {
+                listener.onReceiveFromClient(bytes, this, clientPool);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onClientSend(byte[] bytes) {
+        for (IClientIOListener listener : clientIOListenerList) {
+            try {
+                listener.onSendToClient(bytes, this, clientPool);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -129,7 +160,7 @@ dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
         synchronized (ioManager) {
             if (!isReadThreadStarted) {
                 isReadThreadStarted = true;
-                ioManager.startSendThread();
+                ioManager.startReceiveThread();
             }
         }
     }
@@ -145,28 +176,6 @@ dispatcher.dispatch(ServerActionType.Server.ACTION_LISTENING);
     public void removeAllClientIOListener() {
         synchronized (clientIOListenerList) {
             clientIOListenerList.clear();
-        }
-    }
-
-    @Override
-    public void onClientReceive(byte[] bytes) {
-        for (IClientIOListener listener : clientIOListenerList) {
-            try {
-                listener.onClientReceive(bytes, this, clientPool);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void onClientSend(byte[] bytes) {
-        for (IClientIOListener listener : clientIOListenerList) {
-            try {
-                listener.onClientSend(bytes, this, clientPool);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
