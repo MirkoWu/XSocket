@@ -1,7 +1,8 @@
-package com.mirkowu.xsocket.core.server.client;
+package com.mirkowu.xsocket.server;
 
 import com.mirkowu.xsocket.core.IConnectable;
 import com.mirkowu.xsocket.core.IDisconnectable;
+import com.mirkowu.xsocket.core.ISendData;
 
 public interface IClient extends IConnectable, IDisconnectable {
 
@@ -13,9 +14,11 @@ public interface IClient extends IConnectable, IDisconnectable {
 
     String getUniqueTag();
 
-    void send(byte[] bytes);
+    void send(ISendData sendData);
 
     void addClientIOListener(IClientIOListener listener);
+
     void removeClientIOListener(IClientIOListener listener);
+
     void removeAllClientIOListener();
 }

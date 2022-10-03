@@ -31,13 +31,11 @@ public class SimplexThread extends LoopThread {
     protected void onLoopExec() throws Exception{
         if (sender != null) {
             boolean result = sender.send();
-            dispatcher.dispatchAction(ActionType.ACTION_SEND);
             if (result) {
                 if (receiver != null) {
                     byte[] data = receiver.receive();
                     dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(data));
                     XLog.e(getClass().getSimpleName() + " receiver :" + ByteUtils.bytes2String(data));
-
                 }
             }
         }

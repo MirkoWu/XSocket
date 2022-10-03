@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server.client;
+package com.mirkowu.xsocket.server.client;
 
 
 import java.util.Iterator;

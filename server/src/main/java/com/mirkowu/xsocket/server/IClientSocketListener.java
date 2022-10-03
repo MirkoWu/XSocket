@@ -1,4 +1,6 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.server;
+
+import com.mirkowu.xsocket.core.ISendData;
 
 public interface IClientSocketListener {
 
@@ -12,6 +14,7 @@ public interface IClientSocketListener {
 
     void onClientReceive(byte[] bytes);
 
-    void onClientSend(byte[] bytes);
+    void onClientSend(ISendData sendData);
+
 
 }

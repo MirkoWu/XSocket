@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server.io;
+package com.mirkowu.xsocket.server.io;
 
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.action.ActionType;
@@ -23,7 +23,6 @@ public class ClientSendThread extends LoopThread {
     @Override
     protected void onLoopExec() throws Exception {
         sender.send();
-        dispatcher.dispatchAction(ActionType.ACTION_SEND,null);
     }
 
     @Override

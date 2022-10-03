@@ -8,15 +8,21 @@ import android.view.View;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
+import com.mirkowu.xsocket.core.IPulseSendData;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.client.XSocket;
-import com.mirkowu.xsocket.core.listener.IServerSocketListener;
-import com.mirkowu.xsocket.core.server.IShutdown;
-import com.mirkowu.xsocket.core.server.client.IClient;
-import com.mirkowu.xsocket.core.server.client.IClientIOListener;
-import com.mirkowu.xsocket.core.server.client.IClientPool;
-import com.mirkowu.xsocket.core.server.IServerManager;
+import com.mirkowu.xsocket.server.IServerSocketListener;
+import com.mirkowu.xsocket.server.IShutdown;
+import com.mirkowu.xsocket.server.IClient;
+import com.mirkowu.xsocket.server.IClientIOListener;
+import com.mirkowu.xsocket.server.IClientPool;
+import com.mirkowu.xsocket.server.IServerManager;
 import com.mirkowu.xsocket.core.util.ByteUtils;
+import com.mirkowu.xsocket.server.XSocketServer;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements IClientIOListener {
 
@@ -31,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IServerManager serverManager;
 
     public void clickServer(View view) {
-        serverManager = new XSocket().getServer(8888);
+        serverManager = new XSocketServer().getServer(8888);
         serverManager.registerSocketListener(new IServerSocketListener() {
             @Override
             public void onServerListening(int serverPort) {
@@ -43,9 +49,14 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
                 XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
 
-             //   client.addClientIOListener(MainActivity.this);
+                //   client.addClientIOListener(MainActivity.this);
 
-                client.send(("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes());
+                client.send(new ISendData() {
+                    @Override
+                    public byte[] getData() {
+                        return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                    }
+                });
 
             }
 
@@ -61,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
             }
 
             @Override
-            public void onServerAlreadyShutdown(int serverPort,Throwable e) {
+            public void onServerAlreadyShutdown(int serverPort, Throwable e) {
                 XLog.e("server  , onServerAlreadyShutdown :" + serverPort + (e != null ? e.toString() : "null"));
 
             }
@@ -76,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     }
 
     @Override
-    public void onSendToClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
-        XLog.e("server onSendToClient :" + ByteUtils.bytes2String(bytes));
+    public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
+        XLog.e("server onSendToClient :" + ByteUtils.bytes2String(sendData.getData()));
 
     }
 
@@ -90,17 +101,18 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IConnectManager manager;
 
     public void clickConnect(View view) {
-        manager = new XSocket().connect("127.0.0.1", 8888);
+        manager = new XSocket().connect("192.168.1.1", 80);
+//        manager = new XSocket().connect("127.0.0.1", 8888);
         manager.registerSocketListener(new ISocketListener() {
 
             @Override
-            public void onSend(IPConfig config, byte[] bytes) {
-                XLog.e("onSend :" + ByteUtils.bytes2String(bytes));
+            public void onSend(IPConfig config, ISendData sendData) {
+                XLog.e("onSend :" + ByteUtils.bytes2String(sendData.getData()));
             }
 
             @Override
-            public void onReceive(IPConfig config, byte[] bytes) {
-                XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
+            public void onReceive(IPConfig config, ISendData sendData) {
+                XLog.e("onReceive :" + ByteUtils.bytes2String(sendData.getData()));
             }
 
             @Override
@@ -122,15 +134,40 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
             public void onReconnect(IPConfig config) {
                 XLog.e("onReConnect");
             }
+
+            @Override
+            public void onPulseSend(IPConfig config, IPulseSendData sendData) {
+                XLog.e("onPulseSend" + ByteUtils.bytes2String(sendData.getData()));
+            }
         });
         manager.connect();
 
     }
 
+    /**
+     * 获取wifi列表的请求
+     *
+     * @return
+     */
+    public static JSONObject getWifiList() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("method", "getWifi");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
 
     public void clickSend(View view) {
+
         if (manager != null) {
-            manager.send("hahhahahahha,你好啊，哈哈哈".getBytes());
+            manager.send(new ISendData() {
+                @Override
+                public byte[] getData() {
+                    return getWifiList().toString().getBytes();
+                }
+            });
         }
     }
 

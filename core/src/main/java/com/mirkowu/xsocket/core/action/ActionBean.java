@@ -6,7 +6,6 @@ public class ActionBean {
     public int action;
     public Object data;
     public Object args2;
-  //  public volatile ISocketListener listener;
 
     public ActionBean() {
     }

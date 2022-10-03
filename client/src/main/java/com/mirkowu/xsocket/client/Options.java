@@ -12,6 +12,14 @@ public class Options {
     private ISender sender;
     private IOThreadMode ioThreadMode;
     private AbsReconnectionManager reconnectionManager;
+    private long pulseFrequency;
+    private long pulseFeedLoseTimes;
+
+
+    public Options setPulseFeedLoseTimes(long pulseFeedLoseTimes) {
+        this.pulseFeedLoseTimes = pulseFeedLoseTimes;
+        return this;
+    }
 
     public Options setReceiver(IReceiver receiver) {
         this.receiver = receiver;
@@ -33,6 +41,15 @@ public class Options {
         return this;
     }
 
+    public Options setPulseFrequency(int pulseFrequency) {
+        this.pulseFrequency = pulseFrequency;
+        return this;
+    }
+
+    public long getPulseFeedLoseTimes() {
+        return pulseFeedLoseTimes;
+    }
+
     public IReceiver getReceiver() {
         return receiver;
     }
@@ -47,6 +64,10 @@ public class Options {
 
     public AbsReconnectionManager getReconnectionManager() {
         return reconnectionManager;
+    }
+
+    public long getPulseFrequency() {
+        return pulseFrequency;
     }
 
     public static Options defaultOptions() {

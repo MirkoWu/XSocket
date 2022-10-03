@@ -1,13 +1,14 @@
-package com.mirkowu.xsocket.core.server.io;
+package com.mirkowu.xsocket.server.io;
 
 import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.ReceiverImp;
 import com.mirkowu.xsocket.core.SenderImp;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.IIOManager;
-import com.mirkowu.xsocket.core.server.ServerOptions;
+import com.mirkowu.xsocket.server.ServerOptions;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,7 +48,7 @@ public class ClientIOManager implements IIOManager {
             }
         }
         receiver.init(inputStream);
-        sender.init(outputStream);
+        sender.init(outputStream,clientActionDispatcher);
     }
 
     @Override
@@ -74,8 +75,8 @@ public class ClientIOManager implements IIOManager {
     }
 
     @Override
-    public void send(byte[] bytes) {
-        sender.offer(bytes);
+    public void send(ISendData sendData) {
+        sender.offer(sendData);
     }
 
     @Override

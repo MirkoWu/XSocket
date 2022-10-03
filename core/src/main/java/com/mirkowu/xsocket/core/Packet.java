@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.core;
 
-public class Packet implements ISendable{
+public class Packet implements ISendData {
     @Override
     public byte[] getData() {
 

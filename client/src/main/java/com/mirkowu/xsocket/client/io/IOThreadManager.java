@@ -1,6 +1,7 @@
 package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.client.Options;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.ISender;
@@ -42,7 +43,7 @@ public class IOThreadManager implements IIOManager {
         }
 
         receiver.init(inputStream);
-        sender.init(outputStream);
+        sender.init(outputStream,dispatcher);
     }
 
 
@@ -78,8 +79,8 @@ public class IOThreadManager implements IIOManager {
     }
 
     @Override
-    public void send(byte[] bytes) {
-        sender.offer(bytes);
+    public void send(ISendData sendData) {
+        sender.offer(sendData);
     }
 
     public void shutDownAllThread(Exception e) {

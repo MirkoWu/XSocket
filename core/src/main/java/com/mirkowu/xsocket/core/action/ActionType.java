@@ -14,4 +14,6 @@ public interface ActionType {
 
     int ACTION_SEND = 109;
     int ACTION_RECEIVE = 110;
+
+    int ACTION_PULSE_SEND = 111;
 }

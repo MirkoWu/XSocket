@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server.action;
+package com.mirkowu.xsocket.server.action;
 
 public interface ServerActionType {
     interface Server {

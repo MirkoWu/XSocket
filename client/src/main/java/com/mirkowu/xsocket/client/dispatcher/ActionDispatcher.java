@@ -6,6 +6,8 @@ import android.os.Looper;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
+import com.mirkowu.xsocket.core.IPulseSendData;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
@@ -102,10 +104,13 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
         try {
             switch (action) {
                 case ActionType.ACTION_SEND:
-                    listener.onSend(ipConfig, (byte[]) bean.data);
+                    listener.onSend(ipConfig, (ISendData) bean.data);
+                    break;
+               case ActionType.ACTION_PULSE_SEND:
+                    listener.onPulseSend(ipConfig, (IPulseSendData) bean.data);
                     break;
                 case ActionType.ACTION_RECEIVE:
-                    listener.onReceive(ipConfig, (byte[]) bean.data);
+                    listener.onReceive(ipConfig, (ISendData) bean.data);
                     break;
                 case ActionType.ACTION_CONNECT_SUCCESS:
                     listener.onConnectSuccess(ipConfig);

@@ -1,23 +1,23 @@
-package com.mirkowu.xsocket.core.server.action;
+package com.mirkowu.xsocket.server.action;
 
 import android.os.Handler;
 import android.os.Looper;
 
-import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN;
-import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
-import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
-import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_LISTENING;
-import static com.mirkowu.xsocket.core.server.action.ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN;
+import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN;
+import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
+import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
+import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_LISTENING;
+import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN;
 
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
 import com.mirkowu.xsocket.core.listener.IRegister;
-import com.mirkowu.xsocket.core.listener.IServerSocketListener;
-import com.mirkowu.xsocket.core.server.client.IClient;
-import com.mirkowu.xsocket.core.server.client.IClientPool;
-import com.mirkowu.xsocket.core.server.IServerManager;
+import com.mirkowu.xsocket.server.IServerSocketListener;
+import com.mirkowu.xsocket.server.IClient;
+import com.mirkowu.xsocket.server.IClientPool;
+import com.mirkowu.xsocket.server.IServerManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;

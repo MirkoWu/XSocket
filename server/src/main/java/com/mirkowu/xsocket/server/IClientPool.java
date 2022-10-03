@@ -1,4 +1,6 @@
-package com.mirkowu.xsocket.core.server.client;
+package com.mirkowu.xsocket.server;
+
+import com.mirkowu.xsocket.core.ISendData;
 
 public interface IClientPool<K,V> {
 
@@ -11,5 +13,5 @@ public interface IClientPool<K,V> {
 
     boolean isFull();
 
-    void sendToAll(byte[] bytes);
+    void sendToAll(ISendData sendData);
 }

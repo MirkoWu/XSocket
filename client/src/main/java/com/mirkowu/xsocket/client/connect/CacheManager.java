@@ -36,4 +36,27 @@ public class CacheManager {
     }
 
 
+//
+//    public IServerManager getServer(int localPort) {
+//        IServerManagerPrivate manager = mServerManagerMap.get(localPort);
+//        if (manager == null) {
+//            manager = (IServerManagerPrivate) SPIUtils.load(IServerManager.class);
+//            if (manager == null) {
+//                String err = "Oksocket.Server() load error. Server plug-in are required!" +
+//                        " For details link to https://github.com/xuuhaoo/OkSocket";
+//                SLog.e(err);
+//                throw new IllegalStateException(err);
+//            } else {
+//                synchronized (mServerManagerMap) {
+//                    mServerManagerMap.put(localPort, manager);
+//                }
+//                manager.initServerPrivate(localPort);
+//                return manager;
+//            }
+//        }
+//        return manager;
+//    }
+
+
+
 }

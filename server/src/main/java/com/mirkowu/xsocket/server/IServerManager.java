@@ -1,9 +1,7 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.server;
 
 import com.mirkowu.xsocket.core.listener.IRegister;
-import com.mirkowu.xsocket.core.listener.IServerSocketListener;
-import com.mirkowu.xsocket.core.server.client.IClient;
-import com.mirkowu.xsocket.core.server.client.IClientPool;
+import com.mirkowu.xsocket.server.IServerSocketListener;
 
 public interface IServerManager extends IShutdown, IRegister<IServerSocketListener> {
     void listen();

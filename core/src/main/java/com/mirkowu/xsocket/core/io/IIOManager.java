@@ -1,13 +1,14 @@
 package com.mirkowu.xsocket.core.io;
 
-import com.mirkowu.xsocket.core.ISendable;
+import com.mirkowu.xsocket.core.ISendData;
 
 public interface IIOManager {
     void start();
 
-    void send(byte[] bytes);
+    void send(ISendData sendData);
 
     void close();
+
     void close(Exception e);
 
 }

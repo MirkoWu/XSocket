@@ -1,17 +1,13 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.server;
 
-import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.LoopThread;
-import com.mirkowu.xsocket.core.listener.IServerSocketListener;
-import com.mirkowu.xsocket.core.server.action.ServerActionDispatcher;
-import com.mirkowu.xsocket.core.server.action.ServerActionType;
-import com.mirkowu.xsocket.core.server.client.ClientImp;
-import com.mirkowu.xsocket.core.server.client.ClientPoolImp;
-import com.mirkowu.xsocket.core.server.client.IClient;
-import com.mirkowu.xsocket.core.server.client.IClientPool;
+import com.mirkowu.xsocket.server.client.ClientImp;
+import com.mirkowu.xsocket.server.client.ClientPoolImp;
+import com.mirkowu.xsocket.server.action.ServerActionDispatcher;
+import com.mirkowu.xsocket.server.action.ServerActionType;
 
 import java.io.IOException;
 import java.net.ServerSocket;

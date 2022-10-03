@@ -5,9 +5,6 @@ import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.XLog;
-import com.mirkowu.xsocket.core.server.IServerManager;
-import com.mirkowu.xsocket.core.server.ServerManagerImp;
-import com.mirkowu.xsocket.core.server.ServerOptions;
 
 public class XSocket {
 
@@ -28,7 +25,6 @@ public class XSocket {
     }
 
     public XSocket setReceiver(IReceiver receiver) {
-
         return this;
     }
 
@@ -42,12 +38,6 @@ public class XSocket {
 
     public XSocket setReconnectManager() {
         return this;
-    }
-
-
-    public IServerManager getServer(int serverPort){
-        IServerManager serverManager=  new ServerManagerImp(serverPort, ServerOptions.getDefault());
-        return serverManager;
     }
 
 }

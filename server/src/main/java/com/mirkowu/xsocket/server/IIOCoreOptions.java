@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server;
+package com.mirkowu.xsocket.server;
 
 
 import com.mirkowu.xsocket.core.IReceiver;

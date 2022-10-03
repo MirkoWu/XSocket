@@ -17,14 +17,6 @@ public class ReceiverImp implements IReceiver {
 
     @Override
     public byte[] receive() throws IOException {
-//        try {
-//            if (inputStream.available() <= 0) return null;
-//            byte[] data = new byte[inputStream.available()];
-//            inputStream.read(data);
-//            return data;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         try {
             bos.reset();
             int len = inputStream.read(recBuffer);
@@ -32,8 +24,8 @@ public class ReceiverImp implements IReceiver {
                 bos.write(recBuffer, 0, len);
                 byte[] data = bos.toByteArray();
                 return data;
-            }else {
-                throw new IOException("");
+            } else {
+                throw new IOException("read length = -1 ");
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,6 +1,9 @@
-package com.mirkowu.xsocket.core.server.client;
+package com.mirkowu.xsocket.server.client;
 
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.exception.CacheException;
+import com.mirkowu.xsocket.server.IClient;
+import com.mirkowu.xsocket.server.IClientPool;
 
 public class ClientPoolImp extends AbsClientPool<String, IClient> implements IClientPool<String, IClient> {
 
@@ -39,11 +42,11 @@ public class ClientPoolImp extends AbsClientPool<String, IClient> implements ICl
     }
 
     @Override
-    public void sendToAll(byte[] bytes) {
+    public void sendToAll(ISendData sendData) {
         echoRun(new Echo<String, IClient>() {
             @Override
             public void onEcho(String key, IClient client) {
-                client.send(bytes);
+                client.send(sendData);
             }
         });
     }

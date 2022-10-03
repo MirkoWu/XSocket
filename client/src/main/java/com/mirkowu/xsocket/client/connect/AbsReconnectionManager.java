@@ -1,6 +1,8 @@
 package com.mirkowu.xsocket.client.connect;
 
 import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPulseSendData;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 
@@ -104,17 +106,22 @@ public abstract class AbsReconnectionManager implements ISocketListener {
 
 
     @Override
-    public void onReceive(IPConfig config, byte[] bytes) {
+    public void onReceive(IPConfig config, ISendData sendData) {
 
     }
 
     @Override
-    public void onSend(IPConfig config, byte[] bytes) {
+    public void onSend(IPConfig config, ISendData sendData) {
 
     }
 
     @Override
     public void onReconnect(IPConfig config) {
+
+    }
+
+    @Override
+    public void onPulseSend(IPConfig config, IPulseSendData sendData) {
 
     }
 }

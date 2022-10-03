@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core.server.io;
+package com.mirkowu.xsocket.server.io;
 
 import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.action.ActionBean;

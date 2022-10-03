@@ -1,12 +1,14 @@
-package com.mirkowu.xsocket.core.server.client;
+package com.mirkowu.xsocket.server.client;
 
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.CacheException;
-import com.mirkowu.xsocket.core.server.ServerOptions;
-import com.mirkowu.xsocket.core.server.action.ClientActionDispatcher;
-import com.mirkowu.xsocket.core.server.action.ServerActionType;
-import com.mirkowu.xsocket.core.server.io.ClientIOManager;
+import com.mirkowu.xsocket.server.IClientIOListener;
+import com.mirkowu.xsocket.server.ServerOptions;
+import com.mirkowu.xsocket.server.io.ClientIOManager;
+import com.mirkowu.xsocket.server.action.ClientActionDispatcher;
+import com.mirkowu.xsocket.server.action.ServerActionType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,9 +119,9 @@ public class ClientImp extends AbsClient {
     }
 
     @Override
-    public void send(byte[] bytes) {
+    public void send(ISendData sendData) {
         if (ioManager != null) {
-            ioManager.send(bytes);
+            ioManager.send(sendData);
         }
     }
 
@@ -137,10 +139,10 @@ public class ClientImp extends AbsClient {
     }
 
     @Override
-    public void onClientSend(byte[] bytes) {
+    public void onClientSend(ISendData sendData) {
         for (IClientIOListener listener : clientIOListenerList) {
             try {
-                listener.onSendToClient(bytes, this, clientPool);
+                listener.onSendToClient(sendData, this, clientPool);
             } catch (Exception e) {
                 e.printStackTrace();
             }

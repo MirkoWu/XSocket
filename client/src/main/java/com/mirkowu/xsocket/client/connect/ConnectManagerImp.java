@@ -2,6 +2,7 @@ package com.mirkowu.xsocket.client.connect;
 
 import com.mirkowu.xsocket.client.IPConfig;
 import com.mirkowu.xsocket.client.Options;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.client.dispatcher.ActionDispatcher;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
@@ -21,15 +22,16 @@ import java.net.SocketAddress;
 public class ConnectManagerImp implements IConnectManager {
 
     // ISocket socket;
-  private  IPConfig ipConfig;
-  private  Options options;
-  private  Socket socket;
-  private  volatile boolean isDisconnecting = false;
-  private  volatile boolean isAllowConnect = true;
-  private  IOThreadManager ioThreadManager;
-  private  ConnectThread connectThread;
-  private  ActionDispatcher actionDispatcher;
-  private  AbsReconnectionManager reconnectManager;
+    private IPConfig ipConfig;
+    private Options options;
+    private Socket socket;
+    private volatile boolean isDisconnecting = false;
+    private volatile boolean isAllowConnect = true;
+    private IOThreadManager ioThreadManager;
+    private ConnectThread connectThread;
+    private ActionDispatcher actionDispatcher;
+    private AbsReconnectionManager reconnectManager;
+    private PulseManager pulseManager;
 
     public ConnectManagerImp(IPConfig config) {
         this(config, Options.defaultOptions());
@@ -39,7 +41,8 @@ public class ConnectManagerImp implements IConnectManager {
         this.ipConfig = config;
         this.options = options;
         actionDispatcher = new ActionDispatcher(this, ipConfig);
-      //  reconnectManager = new DefaultReconnectManager(actionDispatcher);
+        //  reconnectManager = new DefaultReconnectManager(actionDispatcher);
+        pulseManager = new PulseManager(this, options);
     }
 
 
@@ -118,9 +121,9 @@ public class ConnectManagerImp implements IConnectManager {
     }
 
     @Override
-    public void send(byte[] bytes) {
-        if (ioThreadManager != null && bytes != null && isConnected()) {
-            ioThreadManager.send(bytes);
+    public void send(ISendData sendData) {
+        if (ioThreadManager != null && sendData != null && isConnected()) {
+            ioThreadManager.send(sendData);
         }
     }
 
@@ -220,8 +223,13 @@ public class ConnectManagerImp implements IConnectManager {
     }
 
     @Override
-    public IActionDispatcher getActionDispatcher(){
+    public IActionDispatcher getActionDispatcher() {
         return actionDispatcher;
+    }
+
+    @Override
+    public PulseManager getPulseManager() {
+        return pulseManager;
     }
 
     @Override
@@ -241,7 +249,6 @@ public class ConnectManagerImp implements IConnectManager {
     void dispatchAction(int action, ActionBean actionBean) {
         actionDispatcher.dispatchAction(action, actionBean);
     }
-
 
 
 }
