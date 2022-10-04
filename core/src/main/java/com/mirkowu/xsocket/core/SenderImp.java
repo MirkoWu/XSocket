@@ -26,7 +26,7 @@ public class SenderImp implements ISender {
             sendData = queue.take();
         } catch (InterruptedException e) {
             //e.printStackTrace();
-            throw e;
+            //throw e;
         }
         byte[] bytes;
         if (sendData != null && (bytes = sendData.getData()) != null) {
