@@ -3,7 +3,7 @@ package com.mirkowu.xsocket.core;
 import android.util.Log;
 
 public class XLog {
-    public static final String TAG = "XSocekt";
+    public static final String TAG = "XSocket";
     public static boolean isDebug = false;
 
     public static void setDebug(boolean debug) {
