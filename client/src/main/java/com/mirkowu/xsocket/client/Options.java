@@ -73,7 +73,7 @@ public class Options {
     public static Options defaultOptions() {
         Options options = new Options();
         options.ioThreadMode = IOThreadMode.DUPLEX;
-        options.reconnectionManager = new DefaultReconnectManager();
+//        options.reconnectionManager = new DefaultReconnectManager();
         return options;
     }
 }

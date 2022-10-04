@@ -25,6 +25,7 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
     public static final String TAG = ActionDispatcher.class.getSimpleName();
     private volatile IConnectManager connectManager;
     private volatile IPConfig ipConfig;
+    private volatile boolean isDisconnectByIOThread = false;
 
     private volatile List<ISocketListener> listenerList = new ArrayList<>();
 
@@ -102,9 +103,8 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                     break;
                 case ActionType.ACTION_CONNECT_FAIL:
                     listener.onConnectFail(ipConfig, (Exception) bean.data);
-                    if (connectManager != null) {
-                        connectManager.disconnect((Exception) bean.data);
-                    }
+
+                    onConnectFail(bean);
                     break;
                 case ActionType.ACTION_DISCONNECT:
                     listener.onDisConnect(ipConfig, (Exception) bean.data);
@@ -114,13 +114,11 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                     break;
                 case ActionType.ACTION_SEND_START:
                 case ActionType.ACTION_RECEIVE_START:
+                    onIOThreadStart(bean);
                     break;
                 case ActionType.ACTION_SEND_SHUTDOWN:
                 case ActionType.ACTION_RECEIVE_SHUTDOWN:
-                    Object exception = bean.data;
-                    if (!(exception instanceof ManualCloseException)) {
-                        connectManager.disconnect((Exception) exception);
-                    }
+                    onIOThreadShutdown(bean);
                     break;
 
             }
@@ -130,4 +128,23 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
     }
 
 
+    private void onConnectFail(ActionBean bean) {
+        if (connectManager != null) {
+            connectManager.disconnect((Exception) bean.data);
+        }
+    }
+
+    private void onIOThreadStart(ActionBean bean) {
+        isDisconnectByIOThread = false;
+    }
+
+    private void onIOThreadShutdown(ActionBean bean) {
+        if (!isDisconnectByIOThread) {
+            isDisconnectByIOThread = true;
+            Object exception = bean.data;
+            if (!(exception instanceof ManualCloseException)) {
+                connectManager.disconnect((Exception) exception);
+            }
+        }
+    }
 }
