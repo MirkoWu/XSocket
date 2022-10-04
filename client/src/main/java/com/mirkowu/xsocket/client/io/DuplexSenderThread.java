@@ -1,5 +1,6 @@
 package com.mirkowu.xsocket.client.io;
 
+import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.XLog;
@@ -19,6 +20,8 @@ public class DuplexSenderThread extends LoopThread {
 
     @Override
     protected void onLoopStart() {
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_START);
+
         XLog.e(getClass().getSimpleName() + " onLoopStart");
     }
 
@@ -31,6 +34,8 @@ public class DuplexSenderThread extends LoopThread {
 
     @Override
     protected void onLoopEnd(Exception e) {
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN,new ActionBean(e));
+
         String msg = e != null ? e.toString() : "null";
         XLog.e(getClass().getSimpleName() + " onLoopEnd :" + msg);
     }

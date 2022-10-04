@@ -25,7 +25,7 @@ public class SenderImp implements ISender {
         try {
             sendData = queue.take();
         } catch (InterruptedException e) {
-           // e.printStackTrace();
+            //e.printStackTrace();
             throw e;
         }
         byte[] bytes;
@@ -39,7 +39,6 @@ public class SenderImp implements ISender {
                 } else {
                     dispatcher.dispatchAction(ActionType.ACTION_SEND, new ActionBean(sendData));
                 }
-
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();

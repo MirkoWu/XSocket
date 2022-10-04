@@ -12,6 +12,7 @@ import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
+import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.listener.IRegister;
 
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                 case ActionType.ACTION_SEND:
                     listener.onSend(ipConfig, (ISendData) bean.data);
                     break;
-               case ActionType.ACTION_PULSE_SEND:
+                case ActionType.ACTION_PULSE_SEND:
                     listener.onPulseSend(ipConfig, (IPulseSendData) bean.data);
                     break;
                 case ActionType.ACTION_RECEIVE:
@@ -101,6 +102,9 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                     break;
                 case ActionType.ACTION_CONNECT_FAIL:
                     listener.onConnectFail(ipConfig, (Exception) bean.data);
+                    if (connectManager != null) {
+                        connectManager.disconnect((Exception) bean.data);
+                    }
                     break;
                 case ActionType.ACTION_DISCONNECT:
                     listener.onDisConnect(ipConfig, (Exception) bean.data);
@@ -108,6 +112,17 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                 case ActionType.ACTION_RECONNECT:
                     listener.onReconnect(ipConfig);
                     break;
+                case ActionType.ACTION_SEND_START:
+                case ActionType.ACTION_RECEIVE_START:
+                    break;
+                case ActionType.ACTION_SEND_SHUTDOWN:
+                case ActionType.ACTION_RECEIVE_SHUTDOWN:
+                    Object exception = bean.data;
+                    if (!(exception instanceof ManualCloseException)) {
+                        connectManager.disconnect((Exception) exception);
+                    }
+                    break;
+
             }
         } catch (Exception e) {
             XLog.e("ActionDispatcher handleAction error: " + e.toString());
