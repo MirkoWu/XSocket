@@ -25,10 +25,10 @@ public class ReceiverImp implements IReceiver {
                 byte[] data = bos.toByteArray();
                 return data;
             } else {
-                throw new IOException("read length = -1 ");
+                throw new IOException("this socket input stream is end of file read -1 ,that mean this socket is disconnected by server");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
             throw e;
         }
     }

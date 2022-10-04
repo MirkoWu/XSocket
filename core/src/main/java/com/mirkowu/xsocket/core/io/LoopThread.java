@@ -3,7 +3,7 @@ package com.mirkowu.xsocket.core.io;
 public abstract class LoopThread implements Runnable {
     protected volatile Thread coreThread;
     protected volatile boolean isRunning = false;
-    protected volatile boolean isShutdown = false;
+//    protected volatile boolean isShutdown = false;
     protected String threadName = this.getClass().getSimpleName();
     protected volatile Exception exception;
 

@@ -11,5 +11,5 @@ public interface ISocketListener extends IConnectStatusListener {
 
     void onPulseSend(IPConfig config, IPulseSendData sendData);
 
-    void onReceive(IPConfig config, ISendData sendData);
+    void onReceive(IPConfig config, byte[] bytes);
 }

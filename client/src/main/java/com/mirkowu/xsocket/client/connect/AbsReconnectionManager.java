@@ -106,7 +106,7 @@ public abstract class AbsReconnectionManager implements ISocketListener {
 
 
     @Override
-    public void onReceive(IPConfig config, ISendData sendData) {
+    public void onReceive(IPConfig config, byte[] bytes) {
 
     }
 

@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
                 XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
 
-                //   client.addClientIOListener(MainActivity.this);
+                client.addClientIOListener(MainActivity.this);
 
                 client.send(new ISendData() {
                     @Override
@@ -101,8 +101,9 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IConnectManager manager;
 
     public void clickConnect(View view) {
-        manager = new XSocket().connect("192.168.1.1", 80);
+//        manager = new XSocket().connect("192.168.1.1", 80);
 //        manager = new XSocket().connect("127.0.0.1", 8888);
+        manager = new XSocket().connect("192.168.2.104", 8888);
         manager.registerSocketListener(new ISocketListener() {
 
             @Override
@@ -111,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
             }
 
             @Override
-            public void onReceive(IPConfig config, ISendData sendData) {
-                XLog.e("onReceive :" + ByteUtils.bytes2String(sendData.getData()));
+            public void onReceive(IPConfig config, byte[] bytes) {
+                XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
             }
 
             @Override

@@ -70,7 +70,9 @@ public class ClientImp extends AbsClient {
     @Override
     public void disconnect(Exception e) {
         if (ioManager != null) {
-            ioManager.close(e);
+            synchronized (ioManager) {
+                ioManager.close(e);
+            }
         } else {
             onClientDead(e);
         }
@@ -124,7 +126,6 @@ public class ClientImp extends AbsClient {
             ioManager.send(sendData);
         }
     }
-
 
 
     @Override

@@ -22,16 +22,6 @@ import java.util.List;
 public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketListener> {
 
     public static final String TAG = ActionDispatcher.class.getSimpleName();
-    //    private static class Holder {
-//        public static HandleDispatcher INSTANCE = new HandleDispatcher();
-//    }
-//
-//    private HandleDispatcher() {
-//    }
-//
-//    public static HandleDispatcher getInstance() {
-//        return Holder.INSTANCE;
-//    }
     private volatile IConnectManager connectManager;
     private volatile IPConfig ipConfig;
 
@@ -84,12 +74,6 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
 
     public synchronized void dispatchActionToListener(int action, ActionBean bean, ISocketListener listener) {
         if (bean == null) bean = new ActionBean();
-        // bean.listener = listener;
-
-//        Message message = Message.obtain();
-//        message.arg1 = action;
-//        message.obj = bean;
-//        mHandler.sendMessage(message);
         ActionBean finalBean = bean;
         mHandler.post(new Runnable() {
             @Override
@@ -110,7 +94,7 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
                     listener.onPulseSend(ipConfig, (IPulseSendData) bean.data);
                     break;
                 case ActionType.ACTION_RECEIVE:
-                    listener.onReceive(ipConfig, (ISendData) bean.data);
+                    listener.onReceive(ipConfig, (byte[]) bean.data);
                     break;
                 case ActionType.ACTION_CONNECT_SUCCESS:
                     listener.onConnectSuccess(ipConfig);
