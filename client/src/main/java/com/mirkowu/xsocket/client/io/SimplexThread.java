@@ -24,11 +24,14 @@ public class SimplexThread extends LoopThread {
 
     @Override
     protected void onLoopStart() {
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_START);
+        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_START);
+
         XLog.e(getClass().getSimpleName() + " onLoopStart");
     }
 
     @Override
-    protected void onLoopExec() throws Exception{
+    protected void onLoopExec() throws Exception {
         if (sender != null) {
             boolean result = sender.send();
             if (result) {
@@ -45,6 +48,10 @@ public class SimplexThread extends LoopThread {
 
     @Override
     protected void onLoopEnd(Exception e) {
+        ActionBean bean = new ActionBean(e);
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN, bean);
+        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_SHUTDOWN, bean);
+
         String msg = e != null ? e.toString() : "null";
         XLog.e(getClass().getSimpleName() + " onLoopEnd :" + msg);
     }
