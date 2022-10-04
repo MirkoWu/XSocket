@@ -1,10 +1,5 @@
 package com.mirkowu.xsocket.core.util;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -225,74 +220,6 @@ public class ByteUtils {
             e.printStackTrace();
             return string.getBytes();
         }
-    }
-
-    /**
-     * Bytes to JSONObject.
-     */
-    public static JSONObject bytes2JSONObject(final byte[] bytes) {
-        if (bytes == null) return null;
-        try {
-            return new JSONObject(new String(bytes));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * JSONObject to bytes.
-     */
-    public static byte[] jsonObject2Bytes(final JSONObject jsonObject) {
-        if (jsonObject == null) return null;
-        return jsonObject.toString().getBytes();
-    }
-
-    /**
-     * Bytes to JSONArray.
-     */
-    public static JSONArray bytes2JSONArray(final byte[] bytes) {
-        if (bytes == null) return null;
-        try {
-            return new JSONArray(new String(bytes));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * JSONArray to bytes.
-     */
-    public static byte[] jsonArray2Bytes(final JSONArray jsonArray) {
-        if (jsonArray == null) return null;
-        return jsonArray.toString().getBytes();
-    }
-
-    /**
-     * Bytes to Parcelable
-     */
-    public static <T> T bytes2Parcelable(final byte[] bytes,
-                                         final Parcelable.Creator<T> creator) {
-        if (bytes == null) return null;
-        Parcel parcel = Parcel.obtain();
-        parcel.unmarshall(bytes, 0, bytes.length);
-        parcel.setDataPosition(0);
-        T result = creator.createFromParcel(parcel);
-        parcel.recycle();
-        return result;
-    }
-
-    /**
-     * Parcelable to bytes.
-     */
-    public static byte[] parcelable2Bytes(final Parcelable parcelable) {
-        if (parcelable == null) return null;
-        Parcel parcel = Parcel.obtain();
-        parcelable.writeToParcel(parcel, 0);
-        byte[] bytes = parcel.marshall();
-        parcel.recycle();
-        return bytes;
     }
 
     /**

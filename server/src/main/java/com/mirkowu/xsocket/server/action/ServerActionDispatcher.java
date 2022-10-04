@@ -1,8 +1,5 @@
 package com.mirkowu.xsocket.server.action;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN;
 import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
 import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
@@ -52,8 +49,6 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
     private volatile IClientPool<String, IClient> mClientPool;
 
     private IServerManager mServerManager;
-
-    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public ServerActionDispatcher(IServerManager serverManager) {
         this.mServerManager = serverManager;

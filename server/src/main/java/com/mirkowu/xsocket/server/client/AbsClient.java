@@ -1,8 +1,5 @@
 package com.mirkowu.xsocket.server.client;
 
-import android.text.TextUtils;
-
-
 import com.mirkowu.xsocket.server.IClient;
 import com.mirkowu.xsocket.server.IClientSocketListener;
 import com.mirkowu.xsocket.server.ServerOptions;
@@ -46,10 +43,14 @@ public abstract class AbsClient implements IClient, IClientSocketListener {
 
     @Override
     public String getUniqueTag() {
-        if (TextUtils.isEmpty(mUniqueTag)) {
+        if (isEmpty(mUniqueTag)) {
             return getHostIp() + ":" + getHostPort();
         }
         return mUniqueTag;
+    }
+
+    public static boolean isEmpty(CharSequence str) {
+        return str == null || str.length() == 0;
     }
 
     @Override

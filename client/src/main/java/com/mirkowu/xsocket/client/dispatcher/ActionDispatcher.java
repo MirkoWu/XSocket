@@ -34,14 +34,7 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
         this.ipConfig = ipConfig;
     }
 
-    private Handler mHandler = new Handler(Looper.getMainLooper()) {
-//        @Override
-//        public void handleMessage(@NonNull Message msg) {
-//            int action = msg.arg1;
-//            ActionBean bean = (ActionBean) msg.obj;
-//            handleAction(action, bean, bean.listener);
-//        }
-    };
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     @Override
     public void registerSocketListener(ISocketListener listener) {

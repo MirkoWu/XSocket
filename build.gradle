@@ -4,16 +4,14 @@ buildscript {
     repositories {
         //jitpack发布版本时不要带阿里云镜像，会很慢经常超时
         // 阿里云镜像
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/central' }
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+//        maven { url 'https://maven.aliyun.com/repository/public' }
+//        maven { url 'https://maven.aliyun.com/repository/google' }
+//        maven { url 'https://maven.aliyun.com/repository/central' }
+//        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
 
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        //友盟
-        maven { url 'https://repo1.maven.org/maven2/' }
         jcenter()
     }
     dependencies {
@@ -29,10 +27,10 @@ allprojects {
     repositories {
         //jitpack发布版本时不要带阿里云镜像，会很慢经常超时
         // 阿里云镜像
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/google' }
-        maven { url 'https://maven.aliyun.com/repository/central' }
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+//        maven { url 'https://maven.aliyun.com/repository/public' }
+//        maven { url 'https://maven.aliyun.com/repository/google' }
+//        maven { url 'https://maven.aliyun.com/repository/central' }
+//        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
 
         google()
         mavenCentral()
@@ -50,9 +48,6 @@ ext {
     compileSdkVersion = 30
     targetSdkVersion = 29
     minSdkVersion = 21
-
-    mvm_version = 'latest.release'
-    mvm_thirdparty_version = 'latest.release'
 
     //google
     core_ktx_version = '1.6.0'
