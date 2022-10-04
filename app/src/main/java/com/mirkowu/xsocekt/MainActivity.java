@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
             @Override
             public void onDisConnect(IPConfig config, Exception e) {
-                XLog.e("onDisConnect");
+                XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
             }
 
             @Override

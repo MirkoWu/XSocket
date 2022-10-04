@@ -22,7 +22,6 @@ public class DuplexReceiverThread extends LoopThread {
 
     @Override
     protected void onLoopStart() {
-        XLog.e(getClass().getSimpleName() + " onLoopStart");
         dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_START);
     }
 
@@ -35,9 +34,6 @@ public class DuplexReceiverThread extends LoopThread {
     @Override
     protected void onLoopEnd(Exception e) {
         dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_SHUTDOWN, new ActionBean(e));
-
-        String msg = e != null ? e.toString() : "null";
-        XLog.e(getClass().getSimpleName() + " onLoopEnd :" + msg);
     }
 
     @Override
@@ -46,6 +42,5 @@ public class DuplexReceiverThread extends LoopThread {
             receiver.close();
         }
         super.shutdown();
-        XLog.e("DuplexReceiverThread shutdown :" + (isRunning == false));
     }
 }

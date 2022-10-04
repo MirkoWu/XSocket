@@ -26,8 +26,6 @@ public class SimplexThread extends LoopThread {
     protected void onLoopStart() {
         dispatcher.dispatchAction(ActionType.ACTION_SEND_START);
         dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_START);
-
-        XLog.e(getClass().getSimpleName() + " onLoopStart");
     }
 
     @Override
@@ -51,9 +49,6 @@ public class SimplexThread extends LoopThread {
         ActionBean bean = new ActionBean(e);
         dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN, bean);
         dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_SHUTDOWN, bean);
-
-        String msg = e != null ? e.toString() : "null";
-        XLog.e(getClass().getSimpleName() + " onLoopEnd :" + msg);
     }
 
     @Override
