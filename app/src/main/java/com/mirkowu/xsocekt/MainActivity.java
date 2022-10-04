@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IServerManager serverManager;
 
     public void clickServer(View view) {
-        serverManager = new XSocketServer().getServer(8888);
+        serverManager = XSocketServer.getServer(8888);
         serverManager.registerSocketListener(new IServerSocketListener() {
             @Override
             public void onServerListening(int serverPort) {
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     public void clickConnect(View view) {
 //        manager = new XSocket().connect("192.168.1.1", 80);
 //        manager = new XSocket().connect("127.0.0.1", 8888);
-        manager = new XSocket().connect("192.168.2.104", 8888);
+        manager = XSocket.connect("192.168.2.104", 8888);
         manager.registerSocketListener(new ISocketListener() {
 
             @Override

@@ -33,15 +33,10 @@ public class ConnectManagerImp implements IConnectManager {
     private AbsReconnectionManager reconnectManager;
     private PulseManager pulseManager;
 
-    public ConnectManagerImp(IPConfig config) {
-        this(config, Options.defaultOptions());
-    }
-
     public ConnectManagerImp(IPConfig config, Options options) {
         this.ipConfig = config;
         this.options = options;
         actionDispatcher = new ActionDispatcher(this, ipConfig);
-        //  reconnectManager = new DefaultReconnectManager(actionDispatcher);
         pulseManager = new PulseManager(this, options);
     }
 
