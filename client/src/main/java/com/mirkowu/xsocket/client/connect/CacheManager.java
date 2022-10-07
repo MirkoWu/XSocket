@@ -30,7 +30,8 @@ public class CacheManager {
 //
     public IConnectManager get(IPConfig config) {
 //        IConnectManager connectManager=new ConnectManagerImp(config);
-        Options options = new Options().setIOThreadMode(IOThreadMode.SIMPLEX);
+//        Options options = new Options().setIOThreadMode(IOThreadMode.SIMPLEX);
+//        IConnectManager connectManager = new ConnectManagerImp(config,options);
         IConnectManager connectManager = new ConnectManagerImp(config,Options.defaultOptions());
         return connectManager;
     }
