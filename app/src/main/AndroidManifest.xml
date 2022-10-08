@@ -12,7 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.XSocket">
         <activity
-            android:name="com.mirkowu.xsocekt.MainActivity"
+            android:name=".TcpActivity"
+            android:configChanges="keyboardHidden|screenSize|orientation"
+            android:exported="true" >
+
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="keyboardHidden|screenSize|orientation"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

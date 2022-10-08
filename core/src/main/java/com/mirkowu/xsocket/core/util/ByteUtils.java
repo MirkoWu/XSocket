@@ -9,10 +9,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class ByteUtils {
 
-    private static final int    BUFFER_SIZE      = 8192;
+    private static final int BUFFER_SIZE = 8192;
     private static final char[] HEX_DIGITS_UPPER =
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final char[] HEX_DIGITS_LOWER =
@@ -20,6 +21,24 @@ public class ByteUtils {
 
     private ByteUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
+    }
+
+    public static byte[] concat(byte[] first, byte[]... rest) {
+        int totalLength = first.length;
+
+        for (byte[] array : rest) {
+            totalLength += array.length;
+        }
+
+        byte[] result = Arrays.copyOf(first, totalLength);
+        int offset = first.length;
+
+        for (byte[] array : rest) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
+        }
+
+        return result;
     }
 
     /**
@@ -269,6 +288,7 @@ public class ByteUtils {
             }
         }
     }
+
     private static String getSafeCharset(String charsetName) {
         String cn = charsetName;
         if (isSpace(charsetName) || !Charset.isSupported(charsetName)) {

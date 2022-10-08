@@ -11,11 +11,11 @@ public class XSocket {
         // return this;
     }
 
-    public static IConnectManager connect(String ip, int port) {
+    public static IConnectManager config(String ip, int port) {
         return CacheManager.getInstance().get(new IPConfig(ip, port));
     }
 
-    public static IConnectManager connect(String ip, int port, Options options) {
+    public static IConnectManager config(String ip, int port, Options options) {
         return CacheManager.getInstance().get(new IPConfig(ip, port), options);
     }
 }

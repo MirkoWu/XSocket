@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".TcpActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送的内容" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/sv_send"
+        android:background="#09000000">
+
+        <TextView
+            android:id="@+id/tv_content_send"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="接收的内容" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/sv_receive"
+        android:background="#09000000">
+
+        <TextView
+            android:id="@+id/tv_content_receive"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="" />
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/et_ip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:digits="0123456789."
+            android:layout_weight="1"
+            android:hint="ip" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":" />
+
+        <EditText
+            android:id="@+id/et_port"
+            android:layout_width="80dp"
+            android:inputType="number"
+            android:layout_height="wrap_content"
+            android:hint="port" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_connect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:onClick="clickConnect"
+            android:layout_weight="1"
+            android:text="连接" />
+
+        <Button
+            android:id="@+id/btn_clear_log"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:onClick="clickClearLog"
+            android:layout_weight="1"
+            android:text="清除log" />
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/et_send"
+        android:layout_weight="1"
+        android:gravity="left"
+        android:hint="要发送的内容" />
+
+    <Button
+        android:id="@+id/btn_send"
+        android:layout_width="match_parent"
+        android:onClick="clickSend"
+        android:enabled="false"
+        android:layout_height="wrap_content"
+        android:text="发送" />
+</LinearLayout>

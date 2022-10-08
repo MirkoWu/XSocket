@@ -2,6 +2,7 @@ package com.mirkowu.xsocekt;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -83,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     @Override
     public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
         XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
+        client.send(new ISendData() {
+            @Override
+            public byte[] getData() {
+                return ByteUtils.concat("我已收到：".getBytes(),bytes);
+            }
+        });
 
     }
 
@@ -101,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IConnectManager manager;
 
     public void clickConnect(View view) {
-        manager = new XSocket().connect("192.168.1.1", 80);
-//        manager = new XSocket().connect("127.0.0.1", 8888);
+//        manager = new XSocket().connect("192.168.1.1", 80);
+        manager = new XSocket().config("127.0.0.1", 8888);
 //        manager = XSocket.connect("192.168.2.104", 8888);
         manager.registerSocketListener(new ISocketListener() {
 
@@ -179,4 +186,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     }
 
 
+    public void clickTCP(View view) {
+        startActivity(new Intent(this,TcpActivity.class));
+    }
 }
