@@ -101,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IConnectManager manager;
 
     public void clickConnect(View view) {
+        if(manager!=null && manager.isConnected()) {
+            manager.disconnect();
+        }
         manager = new XSocket().connect("192.168.1.1", 80);
 //        manager = new XSocket().connect("127.0.0.1", 8888);
 //        manager = XSocket.connect("192.168.2.104", 8888);
@@ -145,6 +148,17 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
     }
 
+    @Override
+    protected void onDestroy() {
+        if(manager!=null){
+            manager.disconnect();
+        }
+        if(serverManager!=null){
+            serverManager.shutdown();
+        }
+        super.onDestroy();
+    }
+
     /**
      * 获取wifi列表的请求
      *
@@ -159,7 +173,20 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
         }
         return jsonObject;
     }
-
+    /**
+     * 发送心跳包
+     *
+     * @return
+     */
+    public static JSONObject getHeart() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("method", "HB");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
     public void clickSend(View view) {
 
         if (manager != null) {
