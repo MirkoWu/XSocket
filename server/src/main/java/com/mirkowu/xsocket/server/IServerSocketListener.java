@@ -2,12 +2,14 @@ package com.mirkowu.xsocket.server;
 
 
 
-public interface IServerSocketListener {
+public interface IServerSocketListener extends IClientIOListener{
     void onServerListening(int serverPort);
 
-    void onClientConnected(IClient client, int serverPort, IClientPool clientPool);
+//    void onClientConnected(IClient client, int serverPort, IClientPool clientPool);
+//
+//    void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool,Exception e);
 
-    void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool,Exception e);
+
 
     void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Exception e);
 

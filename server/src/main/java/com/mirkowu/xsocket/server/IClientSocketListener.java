@@ -15,7 +15,7 @@ public interface IClientSocketListener {
 
     void onClientReceive(byte[] bytes, IPConfig config);
 
-    void onClientSend(ISendData sendData);
+    void onClientSend(ISendData sendData, IPConfig config);
 
 
 }

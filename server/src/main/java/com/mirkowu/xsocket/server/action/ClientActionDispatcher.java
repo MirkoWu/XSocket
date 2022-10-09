@@ -38,7 +38,7 @@ public class ClientActionDispatcher implements IActionDispatcher, IRegister<ICli
                     socketListener.onClientReceive((byte[]) bean.data, (IPConfig) bean.args2);
                     break;
                 case ActionType.ACTION_SEND:
-                    socketListener.onClientSend((ISendData) bean.data);
+                    socketListener.onClientSend((ISendData) bean.data, (IPConfig) bean.args2);
                     break;
                 case ActionType.ACTION_RECEIVE_START:
                     socketListener.onClientReceiveReady();

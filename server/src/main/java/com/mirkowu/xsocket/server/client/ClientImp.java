@@ -3,7 +3,9 @@ package com.mirkowu.xsocket.server.client;
 import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.SocketType;
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.CacheException;
 import com.mirkowu.xsocket.server.IClientIOListener;
@@ -65,6 +67,15 @@ public class ClientImp extends AbsClient {
         }
     }
 
+    public void startReceiveThread() {
+        synchronized (ioManager) {
+            if (!isReadThreadStarted) {
+                isReadThreadStarted = true;
+                ioManager.startReceiveThread();
+            }
+        }
+    }
+
     @Override
     public void connect() {
 
@@ -104,7 +115,7 @@ public class ClientImp extends AbsClient {
         } catch (IOException e1) {
         }
 
-        removeAllClientIOListener();
+        // removeAllClientIOListener();
         isReadThreadStarted = false;
     }
 
@@ -117,7 +128,7 @@ public class ClientImp extends AbsClient {
         if (clientPool != null) {
             clientPool.cache(this);
         }
-        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_CONNECTED, new ActionBean(this));
+        serverActionDispatcher.dispatchAction(ServerActionType.ACTION_CLIENT_CONNECTED, new ActionBean(this));
     }
 
     @Override
@@ -137,12 +148,13 @@ public class ClientImp extends AbsClient {
 
         isDead = true;
 
-        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED, new ActionBean(this, e));
+        serverActionDispatcher.dispatchAction(ServerActionType.ACTION_CLIENT_DISCONNECTED, new ActionBean(this, e));
 
     }
 
     @Override
     public void send(ISendData sendData) {
+        XLog.e("ClientImp send");
         if (ioManager != null) {
             ioManager.send(sendData);
         }
@@ -151,59 +163,70 @@ public class ClientImp extends AbsClient {
 
     @Override
     public void onClientReceive(byte[] bytes, IPConfig config) {
-        for (IClientIOListener listener : clientIOListenerList) {
-            try {
-                if (getSocketType() == SocketType.UDP) {
-                    this.hostIp = config.ip;
-                    this.port = config.port;
-                }
-                listener.onReceiveFromClient(bytes, this, clientPool);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (getSocketType() == SocketType.UDP) {
+            this.hostIp = config.ip;
+            this.port = config.port;
         }
+        serverActionDispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(bytes, this));
+//        for (IClientIOListener listener : clientIOListenerList) {
+//            try {
+//                if (getSocketType() == SocketType.UDP) {
+//                    this.hostIp = config.ip;
+//                    this.port = config.port;
+//                }
+//                listener.onReceiveFromClient(bytes, this, clientPool);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override
-    public void onClientSend(ISendData sendData) {
-        for (IClientIOListener listener : clientIOListenerList) {
-            try {
-                listener.onSendToClient(sendData, this, clientPool);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    public void onClientSend(ISendData sendData, IPConfig config) {
+        if (getSocketType() == SocketType.UDP) {
+            this.hostIp = config.ip;
+            this.port = config.port;
         }
+        serverActionDispatcher.dispatchAction(ActionType.ACTION_SEND, new ActionBean(sendData, this));
+
+//        for (IClientIOListener listener : clientIOListenerList) {
+//            try {
+//                listener.onSendToClient(sendData, this, clientPool);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
-    @Override
-    public void addClientIOListener(IClientIOListener listener) {
-        if (isDead) {
-            return;
-        }
-        synchronized (clientIOListenerList) {
-            if (!clientIOListenerList.contains(listener)) {
-                clientIOListenerList.add(listener);
-            }
-        }
-        synchronized (ioManager) {
-            if (!isReadThreadStarted) {
-                isReadThreadStarted = true;
-                ioManager.startReceiveThread();
-            }
-        }
-    }
-
-    @Override
-    public void removeClientIOListener(IClientIOListener listener) {
-        synchronized (clientIOListenerList) {
-            clientIOListenerList.remove(listener);
-        }
-    }
-
-    @Override
-    public void removeAllClientIOListener() {
-        synchronized (clientIOListenerList) {
-            clientIOListenerList.clear();
-        }
-    }
+//    @Override
+//    public void addClientIOListener(IClientIOListener listener) {
+//        if (isDead) {
+//            return;
+//        }
+//        synchronized (clientIOListenerList) {
+//            if (!clientIOListenerList.contains(listener)) {
+//                clientIOListenerList.add(listener);
+//            }
+//        }
+//        synchronized (ioManager) {
+//            if (!isReadThreadStarted) {
+//                isReadThreadStarted = true;
+//                ioManager.startReceiveThread();
+//            }
+//        }
+//    }
+//
+//    @Override
+//    public void removeClientIOListener(IClientIOListener listener) {
+//        synchronized (clientIOListenerList) {
+//            clientIOListenerList.remove(listener);
+//        }
+//    }
+//
+//    @Override
+//    public void removeAllClientIOListener() {
+//        synchronized (clientIOListenerList) {
+//            clientIOListenerList.clear();
+//        }
+//    }
 }

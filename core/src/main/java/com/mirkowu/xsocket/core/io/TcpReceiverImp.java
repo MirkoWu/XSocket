@@ -19,6 +19,9 @@ public class TcpReceiverImp extends AbsReceiver {
             if (len != -1) {
                 bos.write(recBuffer, 0, len);
                 byte[] data = bos.toByteArray();
+
+                dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(data));
+
                 return data;
             } else {
                 throw new IOException("this socket input stream is end of file read -1 ,that mean this socket is disconnected by server");

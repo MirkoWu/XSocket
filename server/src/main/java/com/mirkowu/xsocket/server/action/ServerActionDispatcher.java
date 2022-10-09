@@ -1,16 +1,14 @@
 package com.mirkowu.xsocket.server.action;
 
-import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN;
-import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_CONNECTED;
-import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_CLIENT_DISCONNECTED;
-import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_LISTENING;
-import static com.mirkowu.xsocket.server.action.ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN;
 
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
 import com.mirkowu.xsocket.core.listener.IRegister;
+import com.mirkowu.xsocket.server.IClientStatusListener;
 import com.mirkowu.xsocket.server.IServerSocketListener;
 import com.mirkowu.xsocket.server.IClient;
 import com.mirkowu.xsocket.server.IClientPool;
@@ -21,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ServerActionDispatcher implements IActionDispatcher, IRegister<IServerSocketListener> {
+public class ServerActionDispatcher implements IActionDispatcher, IRegister<IServerSocketListener>, IClientStatusRegister {
     /**
      * 事件消费队列
      */
@@ -39,6 +37,7 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
      * 回调列表
      */
     private volatile List<IServerSocketListener> mSocketListenerList = new ArrayList<>();
+    private volatile List<IClientStatusListener> mClientStatusListenerList = new ArrayList<>();
     /**
      * 服务器端口
      */
@@ -83,6 +82,27 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
         }
     }
 
+
+    @Override
+    public void registerClientStatusListener(IClientStatusListener listener) {
+        if (listener != null) {
+            synchronized (mClientStatusListenerList) {
+                if (!mClientStatusListenerList.contains(listener)) {
+                    mClientStatusListenerList.add(listener);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void unRegisterClientStatusListener(IClientStatusListener listener) {
+        if (listener != null) {
+            synchronized (mClientStatusListenerList) {
+                mClientStatusListenerList.remove(listener);
+            }
+        }
+    }
+
     @Override
     public void dispatchAction(int action, ActionBean bean) {
         if (bean == null) bean = new ActionBean();
@@ -96,38 +116,47 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
         dispatchAction(action, null);
     }
 
-    private void dispatchActionToListener(int action, ActionBean bean, IServerSocketListener listener) {
-//        mHandler.post(new Runnable() {
-//            @Override
-//            public void run() {
-        handleAction(action, bean, listener);
-//            }
-//        });
-    }
 
-    private void handleAction(int action, ActionBean bean, IServerSocketListener listener) {
+    private void  dispatchServerAction(int action, ActionBean bean, IServerSocketListener listener) {
         try {
             switch (action) {
-                case ACTION_SERVER_LISTENING:
+                case ServerActionType.ACTION_SERVER_LISTENING:
                     listener.onServerListening(mServerPort);
                     break;
-                case ACTION_CLIENT_CONNECTED:
-                    listener.onClientConnected((IClient) bean.data, mServerPort, mClientPool);
+                case ActionType.ACTION_RECEIVE:
+                    listener.onReceiveFromClient((byte[]) bean.data, (IClient) bean.args2, mClientPool);
                     break;
-                case ACTION_CLIENT_DISCONNECTED:
-                    listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool, (Exception) bean.args2);
+                case ActionType.ACTION_SEND:
+                    listener.onSendToClient((ISendData) bean.data, (IClient) bean.args2, mClientPool);
                     break;
-                case ACTION_SERVER_WILL_SHUTDOWN:
+                case ServerActionType.ACTION_SERVER_WILL_SHUTDOWN:
                     listener.onServerWillBeShutdown(mServerPort, mServerManager, mClientPool, (Exception) bean.data);
                     break;
-                case ACTION_SERVER_ALREADY_SHUTDOWN:
+                case ServerActionType.ACTION_SERVER_ALREADY_SHUTDOWN:
                     listener.onServerAlreadyShutdown(mServerPort, (Exception) bean.data);
+                    break;
+
+            }
+        } catch (Exception e) {
+            XLog.e("ServerActionDispatcher handleAction  error:" + e.toString());
+        }
+    }
+
+    private void  dispatchClientStatusAction(int action, ActionBean bean, IClientStatusListener listener) {
+        try {
+            switch (action) {
+                case ServerActionType.ACTION_CLIENT_CONNECTED:
+                    listener.onClientConnected((IClient) bean.data, mServerPort, mClientPool);
+                    break;
+                case ServerActionType.ACTION_CLIENT_DISCONNECTED:
+                    listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool, (Exception) bean.args2);
                     break;
             }
         } catch (Exception e) {
-            XLog.e("ServerActionDispatcher handleAction  error:" +e.toString());
+            XLog.e("ServerActionDispatcher handleAction  error:" + e.toString());
         }
     }
+
 
     private static class DispatchThread extends LoopThread {
         public DispatchThread() {
@@ -144,14 +173,28 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
             ActionBean bean = ACTION_QUEUE.take();
             if (bean != null && bean.dispatcher != null) {
                 ServerActionDispatcher actionDispatcher = (ServerActionDispatcher) bean.dispatcher;
-                synchronized (actionDispatcher.mSocketListenerList) {
-                    List<IServerSocketListener> list = new ArrayList<>(actionDispatcher.mSocketListenerList);
-                    Iterator<IServerSocketListener> it = list.iterator();
-                    while (it.hasNext()) {
-                        IServerSocketListener listener = it.next();
-                        actionDispatcher.dispatchActionToListener(bean.action, bean, listener);
+
+                if(bean.action>ServerActionType.ACTION_CLIENT_STATUS_START
+                        && bean.action<ServerActionType.ACTION_CLIENT_STATUS_END){
+                    synchronized (actionDispatcher.mClientStatusListenerList) {
+                        List<IClientStatusListener> list = new ArrayList<>(actionDispatcher.mClientStatusListenerList);
+                        Iterator<IClientStatusListener> it = list.iterator();
+                        while (it.hasNext()) {
+                            IClientStatusListener listener = it.next();
+                            actionDispatcher.dispatchClientStatusAction(bean.action, bean, listener);
+                        }
+                    }
+                }else{
+                    synchronized (actionDispatcher.mSocketListenerList) {
+                        List<IServerSocketListener> list = new ArrayList<>(actionDispatcher.mSocketListenerList);
+                        Iterator<IServerSocketListener> it = list.iterator();
+                        while (it.hasNext()) {
+                            IServerSocketListener listener = it.next();
+                            actionDispatcher.dispatchServerAction(bean.action, bean, listener);
+                        }
                     }
                 }
+
             }
 
         }

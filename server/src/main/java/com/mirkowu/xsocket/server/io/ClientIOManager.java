@@ -2,6 +2,7 @@ package com.mirkowu.xsocket.server.io;
 
 import com.mirkowu.xsocket.core.IUdpSendData;
 import com.mirkowu.xsocket.core.SocketType;
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.io.IReceiver;
 import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.io.ISender;
@@ -29,15 +30,16 @@ public class ClientIOManager implements IIOManager {
     private ClientSendThread sendThread;
     private IActionDispatcher clientActionDispatcher;
     private boolean isTcp = true;
+
     public ClientIOManager(InputStream inputStream, OutputStream outputStream, ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
         this(serverOptions, clientActionDispatcher);
-        receiver.initTcp(inputStream,clientActionDispatcher);
+        receiver.initTcp(inputStream, clientActionDispatcher);
         sender.initTcp(outputStream, clientActionDispatcher);
     }
 
     public ClientIOManager(DatagramSocket datagramSocket, ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
         this(serverOptions, clientActionDispatcher);
-        receiver.initUdp(datagramSocket,clientActionDispatcher);
+        receiver.initUdp(datagramSocket, clientActionDispatcher);
         sender.initUdp(datagramSocket, clientActionDispatcher);
     }
 
@@ -101,7 +103,9 @@ public class ClientIOManager implements IIOManager {
 
     @Override
     public void send(ISendData sendData) {
-            sender.offer(sendData);
+        XLog.e("ClientIO send111111");
+
+        sender.offer(sendData);
     }
 
     @Override

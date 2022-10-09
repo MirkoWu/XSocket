@@ -110,6 +110,8 @@ public class ConnectManagerImp implements IConnectManager {
 
     @Override
     public void send(ISendData sendData) {
+        XLog.e("ConnectManagerImp send");
+
         if (ioThreadManager != null && sendData != null && isConnected()) {
             ioThreadManager.send(sendData);
         }

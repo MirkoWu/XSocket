@@ -16,6 +16,7 @@ import com.mirkowu.xsocket.core.IUdpSendData;
 import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.client.XSocket;
+import com.mirkowu.xsocket.server.IClientStatusListener;
 import com.mirkowu.xsocket.server.IServerSocketListener;
 import com.mirkowu.xsocket.server.IShutdown;
 import com.mirkowu.xsocket.server.IClient;
@@ -29,7 +30,7 @@ import com.mirkowu.xsocket.server.XSocketServer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity implements IClientIOListener {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,38 +41,62 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     }
 
     IServerManager serverManager;
+    public static volatile long startTime;
 
     public void clickServer(View view) {
         serverManager = XSocketServer.getServer(8888, ServerOptions.getDefault().setSocketType(SocketType.UDP));
         serverManager.registerSocketListener(new IServerSocketListener() {
+
             @Override
             public void onServerListening(int serverPort) {
                 XLog.e("server  , onServerListening :" + serverPort);
             }
 
+
             @Override
-            public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
-                XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
+            public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
+                XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
+                if (bytes == null || bytes.length == 0) return;
+                if (client.getSocketType() == SocketType.TCP) {
+                    client.send(new ISendData() {
+                        @Override
+                        public byte[] getData() {
+                            return ByteUtils.concat(bytes, "-我已收到：".getBytes());
+                        }
+                    });
+                } else {
+//                    startTime = System.currentTimeMillis();
+//                    for (int i = 0; i < 1000; i++) {
+//                        XLog.e("发送测试  :" + i);
 
-                if (client != null) {
-                    client.addClientIOListener(MainActivity.this);
+                        client.send(new IUdpSendData() {
+                            @Override
+                            public String getIp() {
+                                return client.getHostIp();
+                            }
 
-                    if (client.getSocketType() == SocketType.TCP) {
-                        client.send(new ISendData() {
+                            @Override
+                            public int getPort() {
+                                return client.getHostPort();
+                            }
+
                             @Override
                             public byte[] getData() {
-                                return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                                return ByteUtils.concat(bytes, "-我已收到1111：".getBytes());
                             }
                         });
-                    }
+//                    }
+//                    XLog.e("发送测试 server 耗时  end:" + (System.currentTimeMillis() - startTime));
+
                 }
+
 
             }
 
-
             @Override
-            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool, Exception e) {
-                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
+            public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
+                XLog.e("server onSendToClient :" + ByteUtils.bytes2String(sendData.getData()));
+
             }
 
             @Override
@@ -85,47 +110,33 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
             }
         });
+
+        serverManager.registerClientStatusListener(new IClientStatusListener() {
+            @Override
+            public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
+                XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
+
+                if (client != null) {
+                    if (client.getSocketType() == SocketType.TCP) {
+                        client.send(new ISendData() {
+                            @Override
+                            public byte[] getData() {
+                                return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            @Override
+            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool, Exception e) {
+                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
+            }
+        });
         serverManager.listen();
     }
 
-    @Override
-    public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
-        XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
-       if(bytes==null || bytes.length==0) return;
-       if(client.getSocketType()==SocketType.TCP){
-           client.send(new ISendData() {
-               @Override
-               public byte[] getData() {
-                   return ByteUtils.concat( bytes,"-我已收到：".getBytes());
-               }
-           });
-       }else{
-           client.send(new IUdpSendData() {
-               @Override
-               public String getIp() {
-                   return client.getHostIp();
-               }
-
-               @Override
-               public int getPort() {
-                   return client.getHostPort();
-               }
-
-               @Override
-               public byte[] getData() {
-                   return ByteUtils.concat( bytes,"-我已收到：".getBytes());
-               }
-           });
-       }
-
-
-    }
-
-    @Override
-    public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
-        XLog.e("server onSendToClient :" + ByteUtils.bytes2String(sendData.getData()));
-
-    }
 
     public void clickCloseServer(View view) {
         if (serverManager != null) {

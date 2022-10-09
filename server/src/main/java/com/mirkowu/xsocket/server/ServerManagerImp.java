@@ -5,6 +5,7 @@ import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.LoopThread;
+import com.mirkowu.xsocket.server.action.IClientStatusRegister;
 import com.mirkowu.xsocket.server.client.ClientImp;
 import com.mirkowu.xsocket.server.client.ClientPoolImp;
 import com.mirkowu.xsocket.server.action.ServerActionDispatcher;
@@ -15,7 +16,7 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerManagerImp implements IServerManager, IActionDispatcher {
+public class ServerManagerImp implements IServerManager, IActionDispatcher , IClientStatusRegister {
     private IServerSocket mServerSocket;
     private AcceptThread mAcceptThread;
     private ServerOptions mServerOptions;
@@ -58,12 +59,13 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
             } else {
                 clientPoolImp = new ClientPoolImp(mServerOptions.getMaxConnectCapacity());
                 actionDispatcher.setClientPool(clientPoolImp);
-                dispatchAction(ServerActionType.Server.ACTION_SERVER_LISTENING);
+                dispatchAction(ServerActionType.ACTION_SERVER_LISTENING);
 
                 ClientImp client = new ClientImp(mServerOptions, ServerManagerImp.this);
                 DatagramSocket socket = mServerSocket.getDatagramSocket();
                 client.initUdp(socket);
                 client.startSendThread();
+                client.startReceiveThread();
 
             }
 
@@ -111,6 +113,17 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
     }
 
 
+    @Override
+    public void registerClientStatusListener(IClientStatusListener listener) {
+        actionDispatcher.registerClientStatusListener(listener);
+    }
+
+    @Override
+    public void unRegisterClientStatusListener(IClientStatusListener listener) {
+        actionDispatcher.unRegisterClientStatusListener(listener);
+    }
+
+
     private class AcceptThread extends LoopThread {
 
         public AcceptThread(String name) {
@@ -121,7 +134,7 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
         protected void onLoopStart() {
             clientPoolImp = new ClientPoolImp(mServerOptions.getMaxConnectCapacity());
             actionDispatcher.setClientPool(clientPoolImp);
-            dispatchAction(ServerActionType.Server.ACTION_SERVER_LISTENING);
+            dispatchAction(ServerActionType.ACTION_SERVER_LISTENING);
         }
 
         @Override
@@ -130,12 +143,13 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
             Socket socket = mServerSocket.accept();
             client.initTcp(socket, clientPoolImp);
             client.startSendThread();
+            client.startReceiveThread();
         }
 
         @Override
         protected void onLoopEnd(Exception e) {
             //  shutdown(e);
-            //   dispatchAction(ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN, new ActionBean(e));
+            //   dispatchAction(ServerActionType.ACTION_SERVER_WILL_SHUTDOWN, new ActionBean(e));
         }
     }
 
@@ -166,6 +180,6 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
             mAcceptThread = null;
         }
 
-        dispatchAction(ServerActionType.Server.ACTION_SERVER_ALREADY_SHUTDOWN, new ActionBean(e));
+        dispatchAction(ServerActionType.ACTION_SERVER_ALREADY_SHUTDOWN, new ActionBean(e));
     }
 }

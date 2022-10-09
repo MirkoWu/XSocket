@@ -20,9 +20,9 @@ public interface IClient extends IConnectable, IDisconnectable {
 
     void send(ISendData sendData);
 
-    void addClientIOListener(IClientIOListener listener);
-
-    void removeClientIOListener(IClientIOListener listener);
-
-    void removeAllClientIOListener();
+//    void addClientIOListener(IClientIOListener listener);
+//
+//    void removeClientIOListener(IClientIOListener listener);
+//
+//    void removeAllClientIOListener();
 }

@@ -25,7 +25,6 @@ public class DuplexReceiverThread extends LoopThread {
     @Override
     protected void onLoopExec() throws Exception {
         byte[] data = receiver.receive();
-        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(data));
     }
 
     @Override

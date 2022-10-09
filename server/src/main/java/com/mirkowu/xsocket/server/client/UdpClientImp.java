@@ -98,7 +98,7 @@
 ////        if (clientPool != null) {
 ////            clientPool.cache(this);
 ////        }
-//        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_CONNECTED, new ActionBean(this));
+//        serverActionDispatcher.dispatchAction(ServerActionType.ACTION_CLIENT_CONNECTED, new ActionBean(this));
 //    }
 //
 //    @Override
@@ -118,7 +118,7 @@
 //
 //        isDead = true;
 //
-//        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED, new ActionBean(this));
+//        serverActionDispatcher.dispatchAction(ServerActionType.ACTION_CLIENT_DISCONNECTED, new ActionBean(this));
 //
 //    }
 //

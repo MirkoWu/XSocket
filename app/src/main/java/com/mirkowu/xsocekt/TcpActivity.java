@@ -130,8 +130,23 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
 
     }
 
+    private int count = -1;
+    private long firstTime = 0;
+
     @Override
     public void onReceive(IPConfig config, byte[] bytes) {
-        receiveAppend(ByteUtils.bytes2String(bytes));
+//        count++;
+//        if (count == 0) {
+//            firstTime = System.currentTimeMillis();
+//            XLog.e("发送测试 首次接收   :" + (firstTime - MainActivity.startTime));
+//        } else if (count == 999) {
+//            XLog.e("发送测试 接收  end:" + (System.currentTimeMillis() - firstTime));
+//            XLog.e("发送测试 发送-接收  end:" + (System.currentTimeMillis() - MainActivity.startTime));
+//
+//        }
+
+
+        XLog.e("activity  onReceive :" + config.toString() + " " + ByteUtils.bytes2String(bytes));
+     receiveAppend(ByteUtils.bytes2String(bytes));
     }
 }
