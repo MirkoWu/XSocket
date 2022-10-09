@@ -18,10 +18,6 @@ public abstract class AbsReconnectionManager implements ISocketListener {
      */
     protected volatile IConnectManager mConnectManager;
     /**
-     * 心跳管理器
-     */
-    protected PulseManager mPulseManager;
-    /**
      * 是否销毁
      */
     protected volatile boolean mDetach;

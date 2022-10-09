@@ -84,10 +84,11 @@ public class ConnectManagerImp implements IConnectManager {
             try {
                 socket = new Socket();
 
-//                    socket.setReuseAddress(true);//复用端口
-//                    socket.setKeepAlive(true);
-//                    socket.setSoTimeout(TIME_OUT);
-
+                socket.setReuseAddress(true);//复用端口
+                socket.setKeepAlive(true);
+                socket.setSoTimeout(TIME_OUT);
+                //关闭Nagle算法,无论TCP数据报大小,立即发送
+                socket.setTcpNoDelay(true);
                 SocketAddress socketAddress = new InetSocketAddress(ipConfig.ip, ipConfig.port);
 
 //                     socket.bind(socketAddress);
@@ -95,8 +96,7 @@ public class ConnectManagerImp implements IConnectManager {
                 socket.connect(socketAddress, TIME_OUT);
 
                 XLog.e("Start connect: " + ipConfig.ip + ":" + ipConfig.port + " socket server...");
-                //关闭Nagle算法,无论TCP数据报大小,立即发送
-                socket.setTcpNoDelay(true);
+
 
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
