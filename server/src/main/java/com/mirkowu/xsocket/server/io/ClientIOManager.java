@@ -1,22 +1,26 @@
 package com.mirkowu.xsocket.server.io;
 
-import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.IUdpSendData;
+import com.mirkowu.xsocket.core.SocketType;
+import com.mirkowu.xsocket.core.io.IReceiver;
 import com.mirkowu.xsocket.core.ISendData;
-import com.mirkowu.xsocket.core.ISender;
-import com.mirkowu.xsocket.core.ReceiverImp;
-import com.mirkowu.xsocket.core.SenderImp;
+import com.mirkowu.xsocket.core.io.ISender;
+import com.mirkowu.xsocket.core.io.TcpReceiverImp;
+import com.mirkowu.xsocket.core.io.TcpSenderImp;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.IIOManager;
+import com.mirkowu.xsocket.core.io.UdpReceiverImp;
+import com.mirkowu.xsocket.core.io.UdpSenderImp;
 import com.mirkowu.xsocket.server.ServerOptions;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramSocket;
 
 public class ClientIOManager implements IIOManager {
 
-    private InputStream inputStream;
-    private OutputStream outputStream;
+
     private IReceiver receiver;
     private ISender sender;
     private ServerOptions serverOptions;
@@ -24,19 +28,24 @@ public class ClientIOManager implements IIOManager {
     private ClientReceiveThread receiveThread;
     private ClientSendThread sendThread;
     private IActionDispatcher clientActionDispatcher;
-
+    private boolean isTcp = true;
     public ClientIOManager(InputStream inputStream, OutputStream outputStream, ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
+        this(serverOptions, clientActionDispatcher);
+        receiver.initTcp(inputStream,clientActionDispatcher);
+        sender.initTcp(outputStream, clientActionDispatcher);
+    }
+
+    public ClientIOManager(DatagramSocket datagramSocket, ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
+        this(serverOptions, clientActionDispatcher);
+        receiver.initUdp(datagramSocket,clientActionDispatcher);
+        sender.initUdp(datagramSocket, clientActionDispatcher);
+    }
+
+
+    private ClientIOManager(ServerOptions serverOptions, IActionDispatcher clientActionDispatcher) {
         this.serverOptions = serverOptions;
         this.clientActionDispatcher = clientActionDispatcher;
 
-        initIO();
-    }
-
-    private void initIO() {
-        receiver = new ReceiverImp();
-        sender = new SenderImp();
 
         if (serverOptions != null) {
             if (serverOptions.getReceiver() != null) {
@@ -46,9 +55,25 @@ public class ClientIOManager implements IIOManager {
             if (serverOptions.getSender() != null) {
                 sender = serverOptions.getSender();
             }
+            isTcp = serverOptions.getSocketType() == SocketType.TCP;
         }
-        receiver.init(inputStream);
-        sender.init(outputStream,clientActionDispatcher);
+
+        //默认兜底
+        if (receiver == null) {
+            if (isTcp) {
+                receiver = new TcpReceiverImp();
+            } else {
+                receiver = new UdpReceiverImp();
+            }
+        }
+        if (sender == null) {
+            if (isTcp) {
+                sender = new TcpSenderImp();
+            } else {
+                sender = new UdpSenderImp();
+            }
+        }
+
     }
 
     @Override
@@ -76,7 +101,7 @@ public class ClientIOManager implements IIOManager {
 
     @Override
     public void send(ISendData sendData) {
-        sender.offer(sendData);
+            sender.offer(sendData);
     }
 
     @Override

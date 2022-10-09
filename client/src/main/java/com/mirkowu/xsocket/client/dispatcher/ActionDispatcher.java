@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.mirkowu.xsocket.client.connect.IConnectManager;
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.IPulseSendData;
 import com.mirkowu.xsocket.core.ISendData;

@@ -1,8 +1,7 @@
 package com.mirkowu.xsocket.client.connect;
 
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
-import com.mirkowu.xsocket.core.io.IOThreadMode;
 
 import java.util.HashMap;
 

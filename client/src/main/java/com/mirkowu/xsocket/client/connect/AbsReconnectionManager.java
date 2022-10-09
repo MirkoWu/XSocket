@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.client.connect;
 
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.IPulseSendData;
 import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;

@@ -1,5 +1,6 @@
 package com.mirkowu.xsocket.server.action;
 
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
@@ -34,10 +35,11 @@ public class ClientActionDispatcher implements IActionDispatcher, IRegister<ICli
         try {
             switch (action) {
                 case ActionType.ACTION_RECEIVE:
-                    socketListener.onClientReceive((byte[]) bean.data);
+                    socketListener.onClientReceive((byte[]) bean.data, (IPConfig) bean.args2);
                     break;
                 case ActionType.ACTION_SEND:
                     socketListener.onClientSend((ISendData) bean.data);
+                    break;
                 case ActionType.ACTION_RECEIVE_START:
                     socketListener.onClientReceiveReady();
                     break;

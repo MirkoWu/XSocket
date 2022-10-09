@@ -1,19 +1,15 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.core.io;
+
+import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.action.ActionType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-public class ReceiverImp implements IReceiver {
+public class TcpReceiverImp extends AbsReceiver {
     public static final int BUFF_SIZE = 1024;
-    InputStream inputStream;
     byte[] recBuffer = new byte[BUFF_SIZE];
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-    @Override
-    public void init(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
 
     @Override
     public byte[] receive() throws IOException {

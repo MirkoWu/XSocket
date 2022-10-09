@@ -1,45 +1,68 @@
 package com.mirkowu.xsocket.server.client;
 
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.server.IClient;
 import com.mirkowu.xsocket.server.IClientSocketListener;
 import com.mirkowu.xsocket.server.ServerOptions;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 
 public abstract class AbsClient implements IClient, IClientSocketListener {
+    protected DatagramSocket datagramSocket;
     protected Socket mSocket;
-    protected ServerOptions mServerOptions;
-    protected InetAddress mInetAddress;
+//    protected ServerOptions mServerOptions;
+    protected volatile String hostName;
+    protected volatile String hostIp;
+    protected volatile int  port=-1;
+//    protected InetAddress mInetAddress;
+
     protected String mUniqueTag;
 
     protected volatile boolean isCallReady;
     protected volatile boolean isCallDead;
+    protected volatile ClientPoolImp clientPool;
 
-    public AbsClient(Socket socket, ServerOptions serverOptions) {
+    public void initTcp(Socket socket,  ClientPoolImp clientPool  ) {
         this.mSocket = socket;
-        this.mServerOptions = serverOptions;
+        this.clientPool = clientPool;
 
-        this.mInetAddress = socket.getInetAddress();
 //        this.mReaderProtocol = mOkServerOptions.getReaderProtocol();
+
+                 InetAddress  inetAddress= socket.getInetAddress();
+        hostName=  inetAddress.getCanonicalHostName()  ;
+        hostIp=  inetAddress.getHostAddress()  ;
+        port=  socket.getPort()  ;
         mUniqueTag = getHostIp() + ":" + getHostPort() + "-" + System.currentTimeMillis() + "-" + System.nanoTime();
 
     }
 
-    @Override
-    public String getHostIp() {
-        return mInetAddress.getHostAddress();
-    }
+    public void initUdp(DatagramSocket socket ) {
+        this.datagramSocket = socket;
 
-    @Override
-    public int getHostPort() {
-        return mSocket.getPort();
+
+//        this.mInetAddress = socket.getInetAddress();
+////        this.mReaderProtocol = mOkServerOptions.getReaderProtocol();
+//        mUniqueTag = getHostIp() + ":" + getHostPort() + "-" + System.currentTimeMillis() + "-" + System.nanoTime();
+
     }
 
     @Override
     public String getHostName() {
-        return mInetAddress.getCanonicalHostName();
+        return hostName;
     }
+
+    @Override
+    public String getHostIp() {
+        return hostIp;
+    }
+
+    @Override
+    public int getHostPort() {
+        return port;
+    }
+
 
     @Override
     public String getUniqueTag() {

@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.mirkowu.xsocket.client.connect.IConnectManager;
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.IPulseSendData;
 import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.IUdpSendData;
+import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.client.XSocket;
 import com.mirkowu.xsocket.server.IServerSocketListener;
@@ -20,6 +23,7 @@ import com.mirkowu.xsocket.server.IClientIOListener;
 import com.mirkowu.xsocket.server.IClientPool;
 import com.mirkowu.xsocket.server.IServerManager;
 import com.mirkowu.xsocket.core.util.ByteUtils;
+import com.mirkowu.xsocket.server.ServerOptions;
 import com.mirkowu.xsocket.server.XSocketServer;
 
 import org.json.JSONException;
@@ -38,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IServerManager serverManager;
 
     public void clickServer(View view) {
-        serverManager = XSocketServer.getServer(8888);
+        serverManager = XSocketServer.getServer(8888, ServerOptions.getDefault().setSocketType(SocketType.UDP));
         serverManager.registerSocketListener(new IServerSocketListener() {
             @Override
             public void onServerListening(int serverPort) {
@@ -47,33 +51,36 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
             @Override
             public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
-
                 XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
 
-                client.addClientIOListener(MainActivity.this);
+                if (client != null) {
+                    client.addClientIOListener(MainActivity.this);
 
-                client.send(new ISendData() {
-                    @Override
-                    public byte[] getData() {
-                        return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                    if (client.getSocketType() == SocketType.TCP) {
+                        client.send(new ISendData() {
+                            @Override
+                            public byte[] getData() {
+                                return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                            }
+                        });
                     }
-                });
+                }
 
             }
 
 
             @Override
-            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool) {
-                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort);
+            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool, Exception e) {
+                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
             }
 
             @Override
-            public void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Throwable e) {
+            public void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Exception e) {
                 XLog.e("server  , onServerWillBeShutdown :" + serverPort + (e != null ? e.toString() : "null"));
             }
 
             @Override
-            public void onServerAlreadyShutdown(int serverPort, Throwable e) {
+            public void onServerAlreadyShutdown(int serverPort, Exception e) {
                 XLog.e("server  , onServerAlreadyShutdown :" + serverPort + (e != null ? e.toString() : "null"));
 
             }
@@ -84,12 +91,33 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     @Override
     public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
         XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
-        client.send(new ISendData() {
-            @Override
-            public byte[] getData() {
-                return ByteUtils.concat("我已收到：".getBytes(),bytes);
-            }
-        });
+       if(bytes==null || bytes.length==0) return;
+       if(client.getSocketType()==SocketType.TCP){
+           client.send(new ISendData() {
+               @Override
+               public byte[] getData() {
+                   return ByteUtils.concat( bytes,"-我已收到：".getBytes());
+               }
+           });
+       }else{
+           client.send(new IUdpSendData() {
+               @Override
+               public String getIp() {
+                   return client.getHostIp();
+               }
+
+               @Override
+               public int getPort() {
+                   return client.getHostPort();
+               }
+
+               @Override
+               public byte[] getData() {
+                   return ByteUtils.concat( bytes,"-我已收到：".getBytes());
+               }
+           });
+       }
+
 
     }
 
@@ -108,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
     IConnectManager manager;
 
     public void clickConnect(View view) {
-        if(manager!=null && manager.isConnected()) {
+        if (manager != null && manager.isConnected()) {
             manager.disconnect();
         }
-        manager = new XSocket().config("192.168.1.1", 80);
-//        manager = new XSocket().connect("127.0.0.1", 8888);
-//        manager = XSocket.connect("192.168.2.104", 8888);
+        manager = XSocket.config("192.168.1.1", 80);
+//        manager = XSocket.config("127.0.0.1", 8888);
+//        manager = XSocket.config("192.168.2.104", 8888);
         manager.registerSocketListener(new ISocketListener() {
 
             @Override
@@ -157,10 +185,10 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
     @Override
     protected void onDestroy() {
-        if(manager!=null){
+        if (manager != null) {
             manager.disconnect();
         }
-        if(serverManager!=null){
+        if (serverManager != null) {
             serverManager.shutdown();
         }
         super.onDestroy();
@@ -180,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
         }
         return jsonObject;
     }
+
     /**
      * 发送心跳包
      *
@@ -194,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
         }
         return jsonObject;
     }
+
     public void clickSend(View view) {
 
         if (manager != null) {
@@ -214,6 +244,6 @@ public class MainActivity extends AppCompatActivity implements IClientIOListener
 
 
     public void clickTCP(View view) {
-        startActivity(new Intent(this,TcpActivity.class));
+        startActivity(new Intent(this, TcpActivity.class));
     }
 }

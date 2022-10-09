@@ -1,13 +1,13 @@
-package com.mirkowu.xsocket.client.io;
+package com.mirkowu.xsocket.server.io;
 
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.util.ByteUtils;
+import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.IReceiver;
 import com.mirkowu.xsocket.core.io.ISender;
-import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.io.LoopThread;
+import com.mirkowu.xsocket.core.util.ByteUtils;
 
 public class SimplexThread extends LoopThread {
     IReceiver receiver;

@@ -1,6 +1,7 @@
 package com.mirkowu.xsocket.server.io;
 
-import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.action.ActionBean;
+import com.mirkowu.xsocket.core.io.ISender;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
@@ -27,7 +28,7 @@ public class ClientSendThread extends LoopThread {
 
     @Override
     protected void onLoopEnd(Exception e) {
-        dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN);
+        dispatcher.dispatchAction(ActionType.ACTION_SEND_SHUTDOWN, new ActionBean(e));
 
     }
 

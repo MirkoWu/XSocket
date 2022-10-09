@@ -53,6 +53,7 @@
             android:inputType="text"
             android:digits="0123456789."
             android:layout_weight="1"
+            android:text="127.0.0.1"
             android:hint="ip" />
 
         <TextView
@@ -64,6 +65,7 @@
             android:id="@+id/et_port"
             android:layout_width="80dp"
             android:inputType="number"
+            android:text="8888"
             android:layout_height="wrap_content"
             android:hint="port" />
     </LinearLayout>

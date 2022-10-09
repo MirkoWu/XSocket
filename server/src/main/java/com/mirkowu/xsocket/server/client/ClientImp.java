@@ -1,6 +1,8 @@
 package com.mirkowu.xsocket.server.client;
 
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.CacheException;
@@ -13,6 +15,7 @@ import com.mirkowu.xsocket.server.action.ServerActionType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,28 +28,33 @@ public class ClientImp extends AbsClient {
     private IActionDispatcher clientActionDispatcher;
     private IActionDispatcher serverActionDispatcher;
 
-    private volatile ClientPoolImp clientPool;
+    private volatile ServerOptions mServerOptions;
 
     private volatile List<IClientIOListener> clientIOListenerList = new ArrayList<>();
 
-    public ClientImp(Socket socket, ServerOptions serverOptions, ClientPoolImp clientPool, IActionDispatcher serverActionDispatcher) {
-        super(socket, serverOptions);
-        this.clientPool = clientPool;
+    public ClientImp(ServerOptions serverOptions, IActionDispatcher serverActionDispatcher) {
+        this.mServerOptions = serverOptions;
         this.serverActionDispatcher = serverActionDispatcher;
-        clientActionDispatcher = new ClientActionDispatcher(this);
+        this.clientActionDispatcher = new ClientActionDispatcher(this);
+    }
 
+    @Override
+    public void initTcp(Socket socket, ClientPoolImp clientPool) {
+        super.initTcp(socket, clientPool);
         try {
-            initIOManager();
+            InputStream inputStream = mSocket.getInputStream();
+            OutputStream outputStream = mSocket.getOutputStream();
+            ioManager = new ClientIOManager(inputStream, outputStream, mServerOptions, clientActionDispatcher);
+
         } catch (IOException e) {
             disconnect(e);
         }
-
     }
 
-    private void initIOManager() throws IOException {
-        InputStream inputStream = mSocket.getInputStream();
-        OutputStream outputStream = mSocket.getOutputStream();
-        ioManager = new ClientIOManager(inputStream, outputStream, mServerOptions, clientActionDispatcher);
+    @Override
+    public void initUdp(DatagramSocket socket) {
+        super.initUdp(socket);
+        ioManager = new ClientIOManager(datagramSocket, mServerOptions, clientActionDispatcher);
     }
 
     public void startSendThread() {
@@ -60,6 +68,11 @@ public class ClientImp extends AbsClient {
     @Override
     public void connect() {
 
+    }
+
+    @Override
+    public SocketType getSocketType() {
+        return mServerOptions.getSocketType();
     }
 
     @Override
@@ -77,9 +90,17 @@ public class ClientImp extends AbsClient {
             onClientDead(e);
         }
         try {
-            synchronized (mSocket) {
-                mSocket.close();
+            if (mSocket != null) {
+                synchronized (mSocket) {
+                    mSocket.close();
+                }
             }
+            if (datagramSocket != null) {
+                synchronized (datagramSocket) {
+                    datagramSocket.close();
+                }
+            }
+
         } catch (IOException e1) {
         }
 
@@ -104,7 +125,7 @@ public class ClientImp extends AbsClient {
         if (isDead) {
             return;
         }
-        if (!(e instanceof CacheException)) {
+        if (clientPool != null && !(e instanceof CacheException)) {
             clientPool.unCache(this);
         }
         if (e != null) {
@@ -116,7 +137,7 @@ public class ClientImp extends AbsClient {
 
         isDead = true;
 
-        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED, new ActionBean(this));
+        serverActionDispatcher.dispatchAction(ServerActionType.Server.ACTION_CLIENT_DISCONNECTED, new ActionBean(this, e));
 
     }
 
@@ -129,9 +150,13 @@ public class ClientImp extends AbsClient {
 
 
     @Override
-    public void onClientReceive(byte[] bytes) {
+    public void onClientReceive(byte[] bytes, IPConfig config) {
         for (IClientIOListener listener : clientIOListenerList) {
             try {
+                if (getSocketType() == SocketType.UDP) {
+                    this.hostIp = config.ip;
+                    this.port = config.port;
+                }
                 listener.onReceiveFromClient(bytes, this, clientPool);
             } catch (Exception e) {
                 e.printStackTrace();

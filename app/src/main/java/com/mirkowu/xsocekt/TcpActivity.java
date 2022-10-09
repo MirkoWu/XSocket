@@ -9,12 +9,15 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.mirkowu.xsocekt.databinding.ActivityTcpBinding;
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
+import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.client.XSocket;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.IPulseSendData;
 import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.SocketType;
+import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 
 public class TcpActivity extends AppCompatActivity implements ISocketListener {
@@ -44,7 +47,7 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
                 Toast.makeText(this, "请输入port", Toast.LENGTH_SHORT).show();
                 return;
             }
-            manager = XSocket.config(ip, Integer.parseInt(port));
+            manager = XSocket.config(ip, Integer.parseInt(port), Options.defaultOptions().setSocketType(SocketType.UDP));
             manager.registerSocketListener(this);
             manager.connect();
         } else {
@@ -84,7 +87,6 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
     public void sendAppend(String content) {
         binding.tvContentSend.append(content + "\n");
         binding.svSend.fullScroll(ScrollView.FOCUS_DOWN);
-
     }
 
     public void receiveAppend(String content) {
@@ -100,12 +102,15 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
 
     @Override
     public void onConnectFail(IPConfig config, Exception e) {
+        XLog.e("onConnectFail :" + (e == null ? "null" : e.toString()));
         binding.btnConnect.setText("点击连接");
         binding.btnSend.setEnabled(false);
     }
 
     @Override
     public void onDisConnect(IPConfig config, Exception e) {
+        XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
+
         binding.btnConnect.setText("点击连接");
         binding.btnSend.setEnabled(false);
     }

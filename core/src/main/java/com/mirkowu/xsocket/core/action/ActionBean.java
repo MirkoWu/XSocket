@@ -4,6 +4,7 @@ package com.mirkowu.xsocket.core.action;
 
 public class ActionBean {
     public int action;
+    public Object dispatcher;
     public Object data;
     public Object args2;
 

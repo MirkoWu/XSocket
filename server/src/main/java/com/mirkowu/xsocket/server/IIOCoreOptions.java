@@ -1,16 +1,18 @@
 package com.mirkowu.xsocket.server;
 
 
-import com.mirkowu.xsocket.core.IReceiver;
-import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.io.AbsReceiver;
+import com.mirkowu.xsocket.core.io.AbsSender;
+import com.mirkowu.xsocket.core.io.IReceiver;
+import com.mirkowu.xsocket.core.io.ISender;
 
 import java.nio.ByteOrder;
 
 public interface IIOCoreOptions {
 
-    ISender getSender();
+    AbsSender getSender();
 
-    IReceiver getReceiver();
+    AbsReceiver getReceiver();
 
     ByteOrder getReadByteOrder();
 

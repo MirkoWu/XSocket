@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.client;
+package com.mirkowu.xsocket.core;
 
 public class IPConfig {
     public String ip;

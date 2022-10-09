@@ -87,7 +87,7 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
     public void dispatchAction(int action, ActionBean bean) {
         if (bean == null) bean = new ActionBean();
         bean.action = action;
-        bean.args2 = this;
+        bean.dispatcher = this;
         ACTION_QUEUE.offer(bean);
     }
 
@@ -115,13 +115,13 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
                     listener.onClientConnected((IClient) bean.data, mServerPort, mClientPool);
                     break;
                 case ACTION_CLIENT_DISCONNECTED:
-                    listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool);
+                    listener.onClientDisconnected((IClient) bean.data, mServerPort, mClientPool, (Exception) bean.args2);
                     break;
                 case ACTION_SERVER_WILL_SHUTDOWN:
-                    listener.onServerWillBeShutdown(mServerPort, mServerManager, mClientPool, (Throwable) bean.data);
+                    listener.onServerWillBeShutdown(mServerPort, mServerManager, mClientPool, (Exception) bean.data);
                     break;
                 case ACTION_SERVER_ALREADY_SHUTDOWN:
-                    listener.onServerAlreadyShutdown(mServerPort, (Throwable) bean.data);
+                    listener.onServerAlreadyShutdown(mServerPort, (Exception) bean.data);
                     break;
             }
         } catch (Exception e) {
@@ -142,8 +142,8 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
         @Override
         protected void onLoopExec() throws Exception {
             ActionBean bean = ACTION_QUEUE.take();
-            if (bean != null && bean.args2 != null) {
-                ServerActionDispatcher actionDispatcher = (ServerActionDispatcher) bean.args2;
+            if (bean != null && bean.dispatcher != null) {
+                ServerActionDispatcher actionDispatcher = (ServerActionDispatcher) bean.dispatcher;
                 synchronized (actionDispatcher.mSocketListenerList) {
                     List<IServerSocketListener> list = new ArrayList<>(actionDispatcher.mSocketListenerList);
                     Iterator<IServerSocketListener> it = list.iterator();

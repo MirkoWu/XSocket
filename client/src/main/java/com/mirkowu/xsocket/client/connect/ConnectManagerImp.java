@@ -1,7 +1,8 @@
 package com.mirkowu.xsocket.client.connect;
 
-import com.mirkowu.xsocket.client.IPConfig;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
+import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.client.dispatcher.ActionDispatcher;
@@ -11,23 +12,21 @@ import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
+import com.mirkowu.xsocket.core.io.IIOManager;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.DatagramSocket;
 
 public class ConnectManagerImp implements IConnectManager {
 
-    // ISocket socket;
     private IPConfig ipConfig;
     private Options options;
-    private Socket socket;
+    private volatile IClientSocket socketClient;
     private volatile boolean isDisconnecting = false;
     private volatile boolean isAllowConnect = true;
-    private IOThreadManager ioThreadManager;
+    private IIOManager ioThreadManager;
     private ConnectThread connectThread;
     private ActionDispatcher actionDispatcher;
     private AbsReconnectionManager reconnectManager;
@@ -38,6 +37,11 @@ public class ConnectManagerImp implements IConnectManager {
         this.options = options;
         actionDispatcher = new ActionDispatcher(this, ipConfig);
         pulseManager = new PulseManager(this, options);
+        if (options.getSocketType() == SocketType.TCP) {
+            socketClient = new TcpClient(config, options);
+        } else {
+            socketClient = new UdpClient(config, options);
+        }
     }
 
 
@@ -80,28 +84,17 @@ public class ConnectManagerImp implements IConnectManager {
 
         @Override
         public void run() {
-            int TIME_OUT = 60 * 1000;
             try {
-                socket = new Socket();
+                socketClient.createSocket();
 
-                socket.setReuseAddress(true);//复用端口
-                socket.setKeepAlive(true);
-                socket.setSoTimeout(TIME_OUT);
-                //关闭Nagle算法,无论TCP数据报大小,立即发送
-                socket.setTcpNoDelay(true);
-                SocketAddress socketAddress = new InetSocketAddress(ipConfig.ip, ipConfig.port);
-
-//                     socket.bind(socketAddress);
-//
-                socket.connect(socketAddress, TIME_OUT);
-
-                XLog.e("Start connect: " + ipConfig.ip + ":" + ipConfig.port + " socket server...");
-
-
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-
-                ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
+                if (options.getSocketType() == SocketType.TCP) {
+                    InputStream inputStream = socketClient.getInputStream();
+                    OutputStream outputStream = socketClient.getOutputStream();
+                    ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
+                } else {
+                    DatagramSocket datagramSocket = socketClient.getDatagramSocket();
+                    ioThreadManager = new IOThreadManager(datagramSocket,ipConfig, options, actionDispatcher);
+                }
                 ioThreadManager.start();
 
                 dispatchAction(ActionType.ACTION_CONNECT_SUCCESS);
@@ -174,9 +167,9 @@ public class ConnectManagerImp implements IConnectManager {
                     connectThread = null;
                 }
 
-                if (socket != null) {
+                if (socketClient != null) {
                     try {
-                        socket.close();
+                        socketClient.close();
                     } catch (IOException e) {
                     }
                 }
@@ -190,7 +183,7 @@ public class ConnectManagerImp implements IConnectManager {
 //                    mException = mException instanceof ManualCloseException ? null : mException;
                 dispatchAction(ActionType.ACTION_DISCONNECT, new ActionBean(mException));
 //                }
-                socket = null;
+                socketClient = null;
 
 //                if (mException != null) {
 //                    SLog.e("socket is disconnecting because: " + mException.getMessage());
@@ -204,12 +197,12 @@ public class ConnectManagerImp implements IConnectManager {
 
     @Override
     public boolean isClosed() {
-        return socket == null || socket.isClosed();
+        return socketClient == null || socketClient.isClosed();
     }
 
     @Override
     public boolean isConnected() {
-        return socket != null && !socket.isClosed() && socket.isConnected();
+        return socketClient != null &&  socketClient.isConnected();
     }
 
     @Override

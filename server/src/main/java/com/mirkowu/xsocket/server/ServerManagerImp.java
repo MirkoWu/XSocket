@@ -1,5 +1,6 @@
 package com.mirkowu.xsocket.server;
 
+import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
@@ -10,23 +11,32 @@ import com.mirkowu.xsocket.server.action.ServerActionDispatcher;
 import com.mirkowu.xsocket.server.action.ServerActionType;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerManagerImp implements IServerManager, IActionDispatcher {
-    private ServerSocket mServerSocket;
+    private IServerSocket mServerSocket;
     private AcceptThread mAcceptThread;
     private ServerOptions mServerOptions;
     private ClientPoolImp clientPoolImp;
     private volatile boolean isInit = false;
     private ServerActionDispatcher actionDispatcher;
     private int mServerPort;
+    private volatile boolean isTcp;
 
     public ServerManagerImp(int serverPort, ServerOptions serverOptions) {
         this.mServerPort = serverPort;
         this.mServerOptions = serverOptions;
         actionDispatcher = new ServerActionDispatcher(this);
         actionDispatcher.setServerPort(serverPort);
+
+        isTcp = mServerOptions.getSocketType() == SocketType.TCP;
+        if (isTcp) {
+            mServerSocket = new TcpServer();
+        } else {
+            mServerSocket = new UdpServer();
+        }
     }
 
     @Override
@@ -38,10 +48,26 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
         }
 
         try {
-            mServerSocket = new ServerSocket(mServerPort);
+
+            mServerSocket.createServerSocket(mServerPort);
             configuration(mServerSocket);
-            mAcceptThread = new AcceptThread("server accepting in ");
-            mAcceptThread.start();
+
+            if (isTcp) {
+                mAcceptThread = new AcceptThread("server accepting in ");
+                mAcceptThread.start();
+            } else {
+                clientPoolImp = new ClientPoolImp(mServerOptions.getMaxConnectCapacity());
+                actionDispatcher.setClientPool(clientPoolImp);
+                dispatchAction(ServerActionType.Server.ACTION_SERVER_LISTENING);
+
+                ClientImp client = new ClientImp(mServerOptions, ServerManagerImp.this);
+                DatagramSocket socket = mServerSocket.getDatagramSocket();
+                client.initUdp(socket);
+                client.startSendThread();
+
+            }
+
+
         } catch (Exception e) {
             shutdown(e);
         }
@@ -49,8 +75,8 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
 
     @Override
     public boolean isLive() {
-        return mServerSocket != null && !mServerSocket.isClosed()
-                && mAcceptThread != null && mAcceptThread.isRunning();
+        return mServerSocket != null && !mServerSocket.isClosed() &&
+                (!isTcp || (isTcp && mAcceptThread != null && mAcceptThread.isRunning()));
     }
 
     @Override
@@ -59,7 +85,7 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
     }
 
 
-    private void configuration(ServerSocket mServerSocket) {
+    private void configuration(IServerSocket mServerSocket) {
 
     }
 
@@ -100,16 +126,15 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher {
 
         @Override
         protected void onLoopExec() throws Exception {
+            ClientImp client = new ClientImp(mServerOptions, ServerManagerImp.this);
             Socket socket = mServerSocket.accept();
-            ClientImp client = new ClientImp(socket, mServerOptions, clientPoolImp, ServerManagerImp.this);
-            //clientPoolImp.cache(client);
-
+            client.initTcp(socket, clientPoolImp);
             client.startSendThread();
         }
 
         @Override
         protected void onLoopEnd(Exception e) {
-          //  shutdown(e);
+            //  shutdown(e);
             //   dispatchAction(ServerActionType.Server.ACTION_SERVER_WILL_SHUTDOWN, new ActionBean(e));
         }
     }

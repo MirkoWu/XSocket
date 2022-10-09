@@ -3,14 +3,18 @@ package com.mirkowu.xsocket.server;
 import com.mirkowu.xsocket.core.IConnectable;
 import com.mirkowu.xsocket.core.IDisconnectable;
 import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.SocketType;
 
 public interface IClient extends IConnectable, IDisconnectable {
+
+    SocketType getSocketType();
+
+    String getHostName();
 
     String getHostIp();
 
     int getHostPort();
 
-    String getHostName();
 
     String getUniqueTag();
 

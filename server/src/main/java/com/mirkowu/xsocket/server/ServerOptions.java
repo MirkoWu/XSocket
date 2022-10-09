@@ -1,11 +1,36 @@
 package com.mirkowu.xsocket.server;
 
-import com.mirkowu.xsocket.core.IReceiver;
-import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.SocketType;
+import com.mirkowu.xsocket.core.io.AbsReceiver;
+import com.mirkowu.xsocket.core.io.AbsSender;
+import com.mirkowu.xsocket.core.io.IReceiver;
+import com.mirkowu.xsocket.core.io.ISender;
 
 import java.nio.ByteOrder;
 
-public class ServerOptions implements IIOCoreOptions{
+public class ServerOptions implements IIOCoreOptions {
+    private SocketType socketType = SocketType.TCP;
+    private AbsReceiver receiver;
+    private AbsSender sender;
+
+    public SocketType getSocketType() {
+        return socketType;
+    }
+
+    public ServerOptions setSocketType(SocketType socketType) {
+        this.socketType = socketType;
+        return this;
+    }
+
+    public ServerOptions setReceiver(AbsReceiver receiver) {
+        this.receiver = receiver;
+        return this;
+    }
+
+    public ServerOptions setSender(AbsSender sender) {
+        this.sender = sender;
+        return this;
+    }
 
     @Override
     public int getMaxConnectCapacity() {
@@ -13,12 +38,12 @@ public class ServerOptions implements IIOCoreOptions{
     }
 
     @Override
-    public ISender getSender() {
+    public AbsSender getSender() {
         return null;
     }
 
     @Override
-    public IReceiver getReceiver() {
+    public AbsReceiver getReceiver() {
         return null;
     }
 
@@ -52,8 +77,8 @@ public class ServerOptions implements IIOCoreOptions{
         return false;
     }
 
-    public static ServerOptions getDefault(){
-        ServerOptions serverOptions=new ServerOptions();
+    public static ServerOptions getDefault() {
+        ServerOptions serverOptions = new ServerOptions();
         return serverOptions;
     }
 }

@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.server.io;
 
-import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.io.IReceiver;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
@@ -25,7 +25,6 @@ public class ClientReceiveThread extends LoopThread {
     @Override
     protected void onLoopExec() throws Exception {
         byte[] bytes = receiver.receive();
-        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(bytes));
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.mirkowu.xsocket.client;
 
 import com.mirkowu.xsocket.client.connect.CacheManager;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.XLog;
 
 public class XSocket {

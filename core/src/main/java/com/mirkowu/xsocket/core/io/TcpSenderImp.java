@@ -1,23 +1,17 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.core.io;
 
+import com.mirkowu.xsocket.core.IPulseSendData;
+import com.mirkowu.xsocket.core.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class SenderImp implements ISender {
-    private OutputStream outputStream;
-    private LinkedBlockingQueue<ISendData> queue = new LinkedBlockingQueue<>();
-    private IActionDispatcher dispatcher;
+public class TcpSenderImp extends AbsSender {
 
-    @Override
-    public void init(OutputStream outputStream, IActionDispatcher dispatcher) {
-        this.outputStream = outputStream;
-        this.dispatcher = dispatcher;
-    }
+    private LinkedBlockingQueue<ISendData> queue = new LinkedBlockingQueue<>();
+
 
     @Override
     public boolean send() throws Exception {

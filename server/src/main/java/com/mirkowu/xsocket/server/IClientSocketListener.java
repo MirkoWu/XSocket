@@ -1,5 +1,6 @@
 package com.mirkowu.xsocket.server;
 
+import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.core.ISendData;
 
 public interface IClientSocketListener {
@@ -12,7 +13,7 @@ public interface IClientSocketListener {
 
     void onClientSendDead(Exception e);
 
-    void onClientReceive(byte[] bytes);
+    void onClientReceive(byte[] bytes, IPConfig config);
 
     void onClientSend(ISendData sendData);
 

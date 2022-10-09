@@ -3,16 +3,13 @@ package com.mirkowu.xsocket.client.io;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.util.ByteUtils;
-import com.mirkowu.xsocket.core.IReceiver;
-import com.mirkowu.xsocket.core.XLog;
+import com.mirkowu.xsocket.core.io.IReceiver;
 import com.mirkowu.xsocket.core.io.LoopThread;
 
 public class DuplexReceiverThread extends LoopThread {
 
-
-    IReceiver receiver;
-    IActionDispatcher dispatcher;
+    private IReceiver receiver;
+    private IActionDispatcher dispatcher;
 
     public DuplexReceiverThread(IReceiver receiver, IActionDispatcher dispatcher) {
         super();

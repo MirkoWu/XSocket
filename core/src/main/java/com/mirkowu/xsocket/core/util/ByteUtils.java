@@ -41,6 +41,12 @@ public class ByteUtils {
         return result;
     }
 
+    public static byte[] sublist(byte[] data, int start, int end) {
+        if (data == null || data.length < start) return null;
+        byte[] bytes = new byte[Math.min(data.length, end) - start];
+        System.arraycopy(data, start, bytes, 0, bytes.length);
+        return bytes;
+    }
     /**
      * Int to hex string.
      *
