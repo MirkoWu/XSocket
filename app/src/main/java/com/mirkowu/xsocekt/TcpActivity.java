@@ -47,7 +47,8 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
                 Toast.makeText(this, "请输入port", Toast.LENGTH_SHORT).show();
                 return;
             }
-            manager = XSocket.config(ip, Integer.parseInt(port), Options.defaultOptions().setSocketType(SocketType.UDP));
+            manager = XSocket.config(ip, Integer.parseInt(port),
+                    Options.defaultOptions().setSocketType(SocketType.UDP));
             manager.registerSocketListener(this);
             manager.connect();
         } else {
@@ -59,6 +60,7 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
     protected void onDestroy() {
         if (manager != null) {
             manager.disconnect();
+            manager.removeAllSocketListener();
         }
         super.onDestroy();
     }
@@ -102,14 +104,14 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
 
     @Override
     public void onConnectFail(IPConfig config, Exception e) {
-        XLog.e("onConnectFail :" + (e == null ? "null" : e.toString()));
+        XLog.e("client onConnectFail :" + (e == null ? "null" : e.toString()));
         binding.btnConnect.setText("点击连接");
         binding.btnSend.setEnabled(false);
     }
 
     @Override
     public void onDisConnect(IPConfig config, Exception e) {
-        XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
+        XLog.e("client onDisConnect :" + (e == null ? "null" : e.toString()));
 
         binding.btnConnect.setText("点击连接");
         binding.btnSend.setEnabled(false);
@@ -122,6 +124,8 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
 
     @Override
     public void onSend(IPConfig config, ISendData sendData) {
+        XLog.e("client  onSend :" + config.toString() + " " + ByteUtils.bytes2String(sendData.getData()));
+
         sendAppend(ByteUtils.bytes2String(sendData.getData()));
     }
 
@@ -146,7 +150,7 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
 //        }
 
 
-        XLog.e("activity  onReceive :" + config.toString() + " " + ByteUtils.bytes2String(bytes));
-     receiveAppend(ByteUtils.bytes2String(bytes));
+        XLog.e("client  onReceive :" + config.toString() + " " + ByteUtils.bytes2String(bytes));
+        receiveAppend(ByteUtils.bytes2String(bytes));
     }
 }

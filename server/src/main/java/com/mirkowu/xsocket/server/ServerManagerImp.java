@@ -16,7 +16,7 @@ import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerManagerImp implements IServerManager, IActionDispatcher , IClientStatusRegister {
+public class ServerManagerImp implements IServerManager, IActionDispatcher, IClientStatusRegister {
     private IServerSocket mServerSocket;
     private AcceptThread mAcceptThread;
     private ServerOptions mServerOptions;
@@ -31,13 +31,6 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher , ICl
         this.mServerOptions = serverOptions;
         actionDispatcher = new ServerActionDispatcher(this);
         actionDispatcher.setServerPort(serverPort);
-
-        isTcp = mServerOptions.getSocketType() == SocketType.TCP;
-        if (isTcp) {
-            mServerSocket = new TcpServer();
-        } else {
-            mServerSocket = new UdpServer();
-        }
     }
 
     @Override
@@ -49,7 +42,13 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher , ICl
         }
 
         try {
+            isTcp = mServerOptions.getSocketType() == SocketType.TCP;
 
+            if (isTcp) {
+                mServerSocket = new TcpServer();
+            } else {
+                mServerSocket = new UdpServer();
+            }
             mServerSocket.createServerSocket(mServerPort);
             configuration(mServerSocket);
 
@@ -68,8 +67,6 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher , ICl
                 client.startReceiveThread();
 
             }
-
-
         } catch (Exception e) {
             shutdown(e);
         }
@@ -139,8 +136,8 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher , ICl
 
         @Override
         protected void onLoopExec() throws Exception {
-            ClientImp client = new ClientImp(mServerOptions, ServerManagerImp.this);
             Socket socket = mServerSocket.accept();
+            ClientImp client = new ClientImp(mServerOptions, ServerManagerImp.this);
             client.initTcp(socket, clientPoolImp);
             client.startSendThread();
             client.startReceiveThread();
@@ -170,6 +167,7 @@ public class ServerManagerImp implements IServerManager, IActionDispatcher , ICl
         try {
             if (mServerSocket != null) {
                 mServerSocket.close();
+                mServerSocket=null;
             }
         } catch (IOException e1) {
         }

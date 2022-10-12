@@ -37,11 +37,7 @@ public class ConnectManagerImp implements IConnectManager {
         this.options = options;
         actionDispatcher = new ActionDispatcher(this, ipConfig);
         pulseManager = new PulseManager(this, options);
-        if (options.getSocketType() == SocketType.TCP) {
-            socketClient = new TcpClient(config, options);
-        } else {
-            socketClient = new UdpClient(config, options);
-        }
+
     }
 
 
@@ -85,6 +81,11 @@ public class ConnectManagerImp implements IConnectManager {
         @Override
         public void run() {
             try {
+                if (options.getSocketType() == SocketType.TCP) {
+                    socketClient = new TcpClient(ipConfig, options);
+                } else {
+                    socketClient = new UdpClient(ipConfig, options);
+                }
                 socketClient.createSocket();
 
                 if (options.getSocketType() == SocketType.TCP) {
@@ -93,7 +94,7 @@ public class ConnectManagerImp implements IConnectManager {
                     ioThreadManager = new IOThreadManager(inputStream, outputStream, options, actionDispatcher);
                 } else {
                     DatagramSocket datagramSocket = socketClient.getDatagramSocket();
-                    ioThreadManager = new IOThreadManager(datagramSocket,ipConfig, options, actionDispatcher);
+                    ioThreadManager = new IOThreadManager(datagramSocket, ipConfig, options, actionDispatcher);
                 }
                 ioThreadManager.start();
 
@@ -110,8 +111,6 @@ public class ConnectManagerImp implements IConnectManager {
 
     @Override
     public void send(ISendData sendData) {
-        XLog.e("ConnectManagerImp send");
-
         if (ioThreadManager != null && sendData != null && isConnected()) {
             ioThreadManager.send(sendData);
         }
@@ -204,7 +203,7 @@ public class ConnectManagerImp implements IConnectManager {
 
     @Override
     public boolean isConnected() {
-        return socketClient != null &&  socketClient.isConnected();
+        return socketClient != null && socketClient.isConnected();
     }
 
     @Override
@@ -231,7 +230,10 @@ public class ConnectManagerImp implements IConnectManager {
     public void unRegisterSocketListener(ISocketListener listener) {
         actionDispatcher.unRegisterSocketListener(listener);
     }
-
+    @Override
+    public void removeAllSocketListener(){
+        actionDispatcher.removeAllSocketListener();
+    }
     void dispatchAction(int action) {
         actionDispatcher.dispatchAction(action);
     }

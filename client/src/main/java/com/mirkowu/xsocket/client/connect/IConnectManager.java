@@ -21,4 +21,5 @@ public interface IConnectManager extends IConnectable, IDisconnectable, IRegiste
 
     PulseManager getPulseManager();
 
+    void removeAllSocketListener();
 }

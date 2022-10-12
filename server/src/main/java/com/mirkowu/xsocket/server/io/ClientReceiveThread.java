@@ -29,7 +29,7 @@ public class ClientReceiveThread extends LoopThread {
 
     @Override
     protected void onLoopEnd(Exception e) {
-        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_SHUTDOWN);
+        dispatcher.dispatchAction(ActionType.ACTION_RECEIVE_SHUTDOWN, new ActionBean(e));
 
     }
 

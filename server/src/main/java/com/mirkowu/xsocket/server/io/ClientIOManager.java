@@ -103,8 +103,6 @@ public class ClientIOManager implements IIOManager {
 
     @Override
     public void send(ISendData sendData) {
-        XLog.e("ClientIO send111111");
-
         sender.offer(sendData);
     }
 

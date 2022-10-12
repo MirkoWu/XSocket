@@ -50,6 +50,9 @@ public class ActionDispatcher implements IActionDispatcher, IRegister<ISocketLis
         }
     }
 
+    public void removeAllSocketListener(){
+        listenerList.clear();
+    }
 
     @Override
     public void dispatchAction(int action) {

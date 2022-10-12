@@ -154,7 +154,6 @@ public class ClientImp extends AbsClient {
 
     @Override
     public void send(ISendData sendData) {
-        XLog.e("ClientImp send");
         if (ioManager != null) {
             ioManager.send(sendData);
         }

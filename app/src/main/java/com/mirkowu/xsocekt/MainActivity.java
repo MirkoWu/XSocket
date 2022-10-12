@@ -42,98 +42,100 @@ public class MainActivity extends AppCompatActivity {
 
     IServerManager serverManager;
     public static volatile long startTime;
+    IServerSocketListener serverSocketListener=new IServerSocketListener() {
 
-    public void clickServer(View view) {
-        serverManager = XSocketServer.getServer(8888, ServerOptions.getDefault().setSocketType(SocketType.UDP));
-        serverManager.registerSocketListener(new IServerSocketListener() {
-
-            @Override
-            public void onServerListening(int serverPort) {
-                XLog.e("server  , onServerListening :" + serverPort);
-            }
+        @Override
+        public void onServerListening(int serverPort) {
+            XLog.e("server  , onServerListening :" + serverPort);
+        }
 
 
-            @Override
-            public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
-                XLog.e("server onReceiveFromClient :" + ByteUtils.bytes2String(bytes));
-                if (bytes == null || bytes.length == 0) return;
-                if (client.getSocketType() == SocketType.TCP) {
-                    client.send(new ISendData() {
-                        @Override
-                        public byte[] getData() {
-                            return ByteUtils.concat(bytes, "-我已收到：".getBytes());
-                        }
-                    });
-                } else {
+        @Override
+        public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
+            XLog.e("server onReceiveFromClient :" +client.getHostIp()+":"+client.getHostPort()+" "+ ByteUtils.bytes2String(bytes));
+            if (bytes == null || bytes.length == 0) return;
+            if (client.getSocketType() == SocketType.TCP) {
+                client.send(new ISendData() {
+                    @Override
+                    public byte[] getData() {
+                        return ByteUtils.concat(bytes, "-我已收到：".getBytes());
+                    }
+                });
+            } else {
 //                    startTime = System.currentTimeMillis();
 //                    for (int i = 0; i < 1000; i++) {
 //                        XLog.e("发送测试  :" + i);
 
-                        client.send(new IUdpSendData() {
-                            @Override
-                            public String getIp() {
-                                return client.getHostIp();
-                            }
+                client.send(new IUdpSendData() {
+                    @Override
+                    public String getIp() {
+                        return client.getHostIp();
+                    }
 
-                            @Override
-                            public int getPort() {
-                                return client.getHostPort();
-                            }
+                    @Override
+                    public int getPort() {
+                        return client.getHostPort();
+                    }
 
-                            @Override
-                            public byte[] getData() {
-                                return ByteUtils.concat(bytes, "-我已收到1111：".getBytes());
-                            }
-                        });
+                    @Override
+                    public byte[] getData() {
+                        return ByteUtils.concat(bytes, "-我已收到1111：".getBytes());
+                    }
+                });
 //                    }
 //                    XLog.e("发送测试 server 耗时  end:" + (System.currentTimeMillis() - startTime));
 
+            }
+
+
+        }
+
+        @Override
+        public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
+            XLog.e("server onSendToClient :"+client.getHostIp()+":"+client.getHostPort()+" " + ByteUtils.bytes2String(sendData.getData()));
+
+        }
+
+        @Override
+        public void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Exception e) {
+            XLog.e("server  , onServerWillBeShutdown :" + serverPort + (e != null ? e.toString() : "null"));
+        }
+
+        @Override
+        public void onServerAlreadyShutdown(int serverPort, Exception e) {
+            XLog.e("server  , onServerAlreadyShutdown :" + serverPort + (e != null ? e.toString() : "null"));
+
+        }
+    };
+
+    IClientStatusListener clientStatusListener= new IClientStatusListener() {
+        @Override
+        public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
+            XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
+
+            if (client != null) {
+                if (client.getSocketType() == SocketType.TCP) {
+                    client.send(new ISendData() {
+                        @Override
+                        public byte[] getData() {
+                            return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
+                        }
+                    });
                 }
-
-
             }
 
-            @Override
-            public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
-                XLog.e("server onSendToClient :" + ByteUtils.bytes2String(sendData.getData()));
+        }
 
-            }
-
-            @Override
-            public void onServerWillBeShutdown(int serverPort, IShutdown shutdown, IClientPool clientPool, Exception e) {
-                XLog.e("server  , onServerWillBeShutdown :" + serverPort + (e != null ? e.toString() : "null"));
-            }
-
-            @Override
-            public void onServerAlreadyShutdown(int serverPort, Exception e) {
-                XLog.e("server  , onServerAlreadyShutdown :" + serverPort + (e != null ? e.toString() : "null"));
-
-            }
-        });
-
-        serverManager.registerClientStatusListener(new IClientStatusListener() {
-            @Override
-            public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
-                XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
-
-                if (client != null) {
-                    if (client.getSocketType() == SocketType.TCP) {
-                        client.send(new ISendData() {
-                            @Override
-                            public byte[] getData() {
-                                return ("你已进入聊天室" + " 当前共有 " + clientPool.size() + " 人").getBytes();
-                            }
-                        });
-                    }
-                }
-
-            }
-
-            @Override
-            public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool, Exception e) {
-                XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
-            }
-        });
+        @Override
+        public void onClientDisconnected(IClient client, int serverPort, IClientPool clientPool, Exception e) {
+            XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
+        }
+    };
+    public void clickServer(View view) {
+        serverManager = XSocketServer.getServer(8888,
+                ServerOptions.getDefault().setSocketType(SocketType.UDP));
+        serverManager.registerSocketListener(serverSocketListener);
+        serverManager.registerClientStatusListener(clientStatusListener);
         serverManager.listen();
     }
 
@@ -145,7 +147,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     IConnectManager manager;
+    ISocketListener socketListener=new ISocketListener() {
 
+        @Override
+        public void onSend(IPConfig config, ISendData sendData) {
+            XLog.e("onSend :" + ByteUtils.bytes2String(sendData.getData()));
+        }
+
+        @Override
+        public void onReceive(IPConfig config, byte[] bytes) {
+            XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
+        }
+
+        @Override
+        public void onConnectSuccess(IPConfig config) {
+            XLog.e("onConnect");
+        }
+
+        @Override
+        public void onConnectFail(IPConfig config, Exception e) {
+            XLog.e("onConnectFail");
+        }
+
+        @Override
+        public void onDisConnect(IPConfig config, Exception e) {
+            XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
+        }
+
+        @Override
+        public void onReconnect(IPConfig config) {
+            XLog.e("onReConnect");
+        }
+
+        @Override
+        public void onPulseSend(IPConfig config, IPulseSendData sendData) {
+            XLog.e("onPulseSend" + ByteUtils.bytes2String(sendData.getData()));
+        }
+    };
     public void clickConnect(View view) {
         if (manager != null && manager.isConnected()) {
             manager.disconnect();
@@ -153,43 +191,7 @@ public class MainActivity extends AppCompatActivity {
         manager = XSocket.config("192.168.1.1", 80);
 //        manager = XSocket.config("127.0.0.1", 8888);
 //        manager = XSocket.config("192.168.2.104", 8888);
-        manager.registerSocketListener(new ISocketListener() {
-
-            @Override
-            public void onSend(IPConfig config, ISendData sendData) {
-                XLog.e("onSend :" + ByteUtils.bytes2String(sendData.getData()));
-            }
-
-            @Override
-            public void onReceive(IPConfig config, byte[] bytes) {
-                XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
-            }
-
-            @Override
-            public void onConnectSuccess(IPConfig config) {
-                XLog.e("onConnect");
-            }
-
-            @Override
-            public void onConnectFail(IPConfig config, Exception e) {
-                XLog.e("onConnectFail");
-            }
-
-            @Override
-            public void onDisConnect(IPConfig config, Exception e) {
-                XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
-            }
-
-            @Override
-            public void onReconnect(IPConfig config) {
-                XLog.e("onReConnect");
-            }
-
-            @Override
-            public void onPulseSend(IPConfig config, IPulseSendData sendData) {
-                XLog.e("onPulseSend" + ByteUtils.bytes2String(sendData.getData()));
-            }
-        });
+        manager.registerSocketListener(socketListener);
         manager.connect();
 
     }

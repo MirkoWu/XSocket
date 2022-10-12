@@ -10,48 +10,47 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 
 public class UdpClient implements IClientSocket {
 
-    DatagramSocket socket;
+    private DatagramSocket socket;
 
     private IPConfig ipConfig;
     private Options options;
-
-    private boolean allowMultiCast;
-
     private volatile boolean isConnected;
+    private InetAddress destAddress;
+    private int TIME_OUT = 60 * 1000;
 
     public UdpClient(IPConfig ipConfig, Options options) {
         this.ipConfig = ipConfig;
         this.options = options;
-        allowMultiCast = options.isAllowMultiCast();
     }
 
-    private InetAddress destAddress;
-    private WifiManager wifiManager;
-    private WifiManager.MulticastLock multicastLock;
-    int TIME_OUT = 60 * 1000;
 
     @Override
     public void createSocket() throws Exception {
-
-
-        // allowMultiCast();
         destAddress = InetAddress.getByName(ipConfig.ip);
-//        if (!destAddress.isMulticastAddress()) {// 检测该地址是否是多播地址
-//            return;
-//        }
-//        socket = new MulticastSocket(null);
-        socket = new DatagramSocket(/*null*/);
+        if (destAddress.isMulticastAddress()) {// 检测该地址是否是多播地址
+            socket = new MulticastSocket(/*null*/);
+        } else {
+            socket = new DatagramSocket(/*null*/);
+        }
+
         socket.setReuseAddress(true);//复用端口
         socket.setBroadcast(true);
-        socket.setSoTimeout(TIME_OUT);
+       // socket.setSoTimeout(TIME_OUT);
         // socket.setTimeToLive(TTL);
-     //   socket.bind(new InetSocketAddress(ipConfig.port));
-        //  socket.joinGroup(destAddress);
+//        socket.bind(new InetSocketAddress());
+        if (socket instanceof MulticastSocket) {
+            //如果主机是多网卡，那么此时就需要注意了，一定要设置用哪个网卡发送和接受数据，因为组播是无法跨网段的，否则会导致数据接收不到。
+            // ((MulticastSocket) socket).setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getByName("10.206.16.67")));
+            ((MulticastSocket) socket).joinGroup(destAddress);
+        }
 
-        isConnected=true;
+        isConnected = true;
     }
 //
 //    private void allowMultiCast() {
@@ -61,25 +60,6 @@ public class UdpClient implements IClientSocket {
 //
 //    }
 
-//    @Override
-//    public void send(byte[] data) throws Exception {
-//
-//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//        String ipAddress = intIP2StringIP(wifiInfo.getIpAddress());//得到IPV4地址
-//        DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(ipAddress), port);
-//        socket.send(dp);
-//    }
-//
-//    @Override
-//    public byte[] receive() throws Exception {
-//        DatagramPacket packet = getReceivePacket();
-//
-//        socket.receive(packet);
-//        byte[] rec = sublist(packet.getData(), packet.getOffset(), packet.getLength());
-//        L.d(new String(rec));
-//        return rec;
-//
-//    }
 
     @Override
     public InputStream getInputStream() {
@@ -98,7 +78,7 @@ public class UdpClient implements IClientSocket {
 
     @Override
     public void close() throws IOException {
-        isConnected=false;
+        isConnected = false;
         if (socket != null) {
             socket.close();
         }
@@ -111,6 +91,6 @@ public class UdpClient implements IClientSocket {
 
     @Override
     public boolean isConnected() {
-        return socket != null && !socket.isClosed() &&isConnected /*&& socket.isConnected()*/;
+        return socket != null && !socket.isClosed() && isConnected /*&& socket.isConnected()*/;
     }
 }

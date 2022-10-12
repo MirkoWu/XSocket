@@ -103,6 +103,7 @@ public class ServerActionDispatcher implements IActionDispatcher, IRegister<ISer
         }
     }
 
+
     @Override
     public void dispatchAction(int action, ActionBean bean) {
         if (bean == null) bean = new ActionBean();

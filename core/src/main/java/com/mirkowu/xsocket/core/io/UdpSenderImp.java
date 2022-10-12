@@ -38,8 +38,6 @@ public class UdpSenderImp extends AbsSender {
                 DatagramPacket packet = new DatagramPacket(bytes, bytes.length, InetAddress.getByName(ip), port);
                 datagramSocket.send(packet);
 
-                XLog.e("UdpSenderImp port=" + port + " send :" + ByteUtils.bytes2String(bytes));
-
                 IPConfig ipConfig = new IPConfig(ip, port);
                 if (sendData instanceof IPulseSendData) {
                     dispatcher.dispatchAction(ActionType.ACTION_PULSE_SEND, new ActionBean(sendData, ipConfig));
@@ -72,8 +70,6 @@ public class UdpSenderImp extends AbsSender {
 
     @Override
     public void offer(ISendData sendData) {
-        XLog.e("ClientIO offer");
-
         if (sendData instanceof IUdpSendData) {
             queue.offer((IUdpSendData) sendData);
         } else {

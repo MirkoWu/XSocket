@@ -16,21 +16,20 @@ public class TcpClient implements IClientSocket {
 
     private IPConfig ipConfig;
     private Options options;
-    InputStream inputStream;
-    OutputStream outputStream;
+    private InputStream inputStream;
+    private OutputStream outputStream;
+    private Socket socket;
+    private int TIME_OUT = 60 * 1000;
 
     public TcpClient(IPConfig ipConfig, Options options) {
         this.ipConfig = ipConfig;
         this.options = options;
     }
 
-    Socket socket;
-    int TIME_OUT = 60 * 1000;
 
     @Override
     public void createSocket() throws Exception {
         socket = new Socket();
-
         socket.setReuseAddress(true);//复用端口
         socket.setKeepAlive(true);
         socket.setSoTimeout(TIME_OUT);
