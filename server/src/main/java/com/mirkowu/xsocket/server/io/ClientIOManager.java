@@ -1,18 +1,16 @@
 package com.mirkowu.xsocket.server.io;
 
-import com.mirkowu.xsocket.core.IUdpSendData;
 import com.mirkowu.xsocket.core.SocketType;
-import com.mirkowu.xsocket.core.XLog;
-import com.mirkowu.xsocket.core.io.IReceiver;
-import com.mirkowu.xsocket.core.ISendData;
-import com.mirkowu.xsocket.core.io.ISender;
-import com.mirkowu.xsocket.core.io.TcpReceiverImp;
-import com.mirkowu.xsocket.core.io.TcpSenderImp;
+import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.data.ISendData;
+import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.tcp.TcpReceiverImp;
+import com.mirkowu.xsocket.core.tcp.TcpSenderImp;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.IIOManager;
-import com.mirkowu.xsocket.core.io.UdpReceiverImp;
-import com.mirkowu.xsocket.core.io.UdpSenderImp;
+import com.mirkowu.xsocket.core.udp.UdpReceiverImp;
+import com.mirkowu.xsocket.core.udp.UdpSenderImp;
 import com.mirkowu.xsocket.server.ServerOptions;
 
 import java.io.InputStream;
@@ -52,7 +50,6 @@ public class ClientIOManager implements IIOManager {
         if (serverOptions != null) {
             if (serverOptions.getReceiver() != null) {
                 receiver = serverOptions.getReceiver();
-
             }
             if (serverOptions.getSender() != null) {
                 sender = serverOptions.getSender();

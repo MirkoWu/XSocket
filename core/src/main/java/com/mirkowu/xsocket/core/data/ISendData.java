@@ -1,4 +1,4 @@
-package com.mirkowu.xsocket.core;
+package com.mirkowu.xsocket.core.data;
 
 public interface ISendData {
 

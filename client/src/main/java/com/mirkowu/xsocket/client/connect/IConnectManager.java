@@ -2,7 +2,7 @@ package com.mirkowu.xsocket.client.connect;
 
 import com.mirkowu.xsocket.core.IConnectable;
 import com.mirkowu.xsocket.core.IDisconnectable;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
 import com.mirkowu.xsocket.core.listener.IRegister;

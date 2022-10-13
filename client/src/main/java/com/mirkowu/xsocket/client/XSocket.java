@@ -1,6 +1,5 @@
 package com.mirkowu.xsocket.client;
 
-import com.mirkowu.xsocket.client.connect.CacheManager;
 import com.mirkowu.xsocket.client.connect.ConnectManagerImp;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.core.IPConfig;

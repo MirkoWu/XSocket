@@ -2,13 +2,13 @@
 //
 //import com.mirkowu.xsocket.core.IConnectable;
 //import com.mirkowu.xsocket.core.IDisconnectable;
-//import com.mirkowu.xsocket.core.ISendData;
+//import com.mirkowu.xsocket.core.data.ISendData;
 //import com.mirkowu.xsocket.core.action.ActionBean;
 //import com.mirkowu.xsocket.core.action.IActionDispatcher;
 //import com.mirkowu.xsocket.core.exception.CacheException;
-//import com.mirkowu.xsocket.server.IClient;
-//import com.mirkowu.xsocket.server.IClientIOListener;
-//import com.mirkowu.xsocket.server.IClientSocketListener;
+//import com.mirkowu.xsocket.server.client.IClient;
+//import com.mirkowu.xsocket.server.listener.IClientIOListener;
+//import com.mirkowu.xsocket.server.listener.IClientSocketListener;
 //import com.mirkowu.xsocket.server.ServerOptions;
 //import com.mirkowu.xsocket.server.action.ClientActionDispatcher;
 //import com.mirkowu.xsocket.server.action.ServerActionType;

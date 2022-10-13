@@ -1,6 +1,6 @@
-package com.mirkowu.xsocket.server;
+package com.mirkowu.xsocket.server.client;
 
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 
 public interface IClientPool<K,V> {
 

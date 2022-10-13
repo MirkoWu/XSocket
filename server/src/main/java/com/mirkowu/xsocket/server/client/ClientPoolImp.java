@@ -1,9 +1,7 @@
 package com.mirkowu.xsocket.server.client;
 
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.exception.CacheException;
-import com.mirkowu.xsocket.server.IClient;
-import com.mirkowu.xsocket.server.IClientPool;
 
 public class ClientPoolImp extends AbsClientPool<String, IClient> implements IClientPool<String, IClient> {
 

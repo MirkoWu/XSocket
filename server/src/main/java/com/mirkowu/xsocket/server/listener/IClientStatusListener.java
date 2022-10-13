@@ -1,6 +1,8 @@
-package com.mirkowu.xsocket.server;
+package com.mirkowu.xsocket.server.listener;
 
 
+import com.mirkowu.xsocket.server.client.IClient;
+import com.mirkowu.xsocket.server.client.IClientPool;
 
 public interface IClientStatusListener {
 

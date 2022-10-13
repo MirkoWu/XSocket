@@ -1,8 +1,7 @@
 package com.mirkowu.xsocket.client.connect;
 
 import com.mirkowu.xsocket.client.Options;
-import com.mirkowu.xsocket.core.IPulseSendData;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.IPulseSendData;
 import com.mirkowu.xsocket.core.exception.PulseDeadException;
 import com.mirkowu.xsocket.core.io.IOThreadMode;
 import com.mirkowu.xsocket.core.io.LoopThread;

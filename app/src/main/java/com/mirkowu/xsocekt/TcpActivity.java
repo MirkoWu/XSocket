@@ -9,16 +9,19 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.mirkowu.xsocekt.databinding.ActivityTcpBinding;
+import com.mirkowu.xsocket.core.AbsReceiver;
 import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.client.XSocket;
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.client.listener.ISocketListener;
-import com.mirkowu.xsocket.core.IPulseSendData;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.IPulseSendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.SocketType;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.util.ByteUtils;
+
+import java.io.IOException;
 
 public class TcpActivity extends AppCompatActivity implements ISocketListener {
 

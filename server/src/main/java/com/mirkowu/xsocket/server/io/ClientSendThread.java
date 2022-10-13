@@ -1,7 +1,7 @@
 package com.mirkowu.xsocket.server.io;
 
 import com.mirkowu.xsocket.core.action.ActionBean;
-import com.mirkowu.xsocket.core.io.ISender;
+import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;

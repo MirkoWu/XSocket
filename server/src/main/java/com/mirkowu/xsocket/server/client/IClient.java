@@ -1,8 +1,8 @@
-package com.mirkowu.xsocket.server;
+package com.mirkowu.xsocket.server.client;
 
 import com.mirkowu.xsocket.core.IConnectable;
 import com.mirkowu.xsocket.core.IDisconnectable;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.SocketType;
 
 public interface IClient extends IConnectable, IDisconnectable {

@@ -1,7 +1,8 @@
-package com.mirkowu.xsocket.core.io;
+package com.mirkowu.xsocket.core.tcp;
 
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
+import com.mirkowu.xsocket.core.AbsReceiver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

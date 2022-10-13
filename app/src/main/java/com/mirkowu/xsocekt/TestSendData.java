@@ -1,6 +1,6 @@
 package com.mirkowu.xsocekt;
 
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 
 public class TestSendData implements ISendData {
     @Override

@@ -1,9 +1,10 @@
-package com.mirkowu.xsocket.core.io;
+package com.mirkowu.xsocket.core.tcp;
 
-import com.mirkowu.xsocket.core.IPulseSendData;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.IPulseSendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
+import com.mirkowu.xsocket.core.AbsSender;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;

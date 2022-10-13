@@ -10,10 +10,13 @@ import com.mirkowu.xsocket.server.client.ClientImp;
 import com.mirkowu.xsocket.server.client.ClientPoolImp;
 import com.mirkowu.xsocket.server.action.ServerActionDispatcher;
 import com.mirkowu.xsocket.server.action.ServerActionType;
+import com.mirkowu.xsocket.server.client.IClient;
+import com.mirkowu.xsocket.server.client.IClientPool;
+import com.mirkowu.xsocket.server.listener.IClientStatusListener;
+import com.mirkowu.xsocket.server.listener.IServerSocketListener;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerManagerImp implements IServerManager, IActionDispatcher, IClientStatusRegister {

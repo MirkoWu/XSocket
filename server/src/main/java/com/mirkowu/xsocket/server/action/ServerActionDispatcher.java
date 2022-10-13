@@ -1,17 +1,17 @@
 package com.mirkowu.xsocket.server.action;
 
 
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.io.LoopThread;
 import com.mirkowu.xsocket.core.listener.IRegister;
-import com.mirkowu.xsocket.server.IClientStatusListener;
-import com.mirkowu.xsocket.server.IServerSocketListener;
-import com.mirkowu.xsocket.server.IClient;
-import com.mirkowu.xsocket.server.IClientPool;
+import com.mirkowu.xsocket.server.listener.IClientStatusListener;
+import com.mirkowu.xsocket.server.listener.IServerSocketListener;
+import com.mirkowu.xsocket.server.client.IClient;
+import com.mirkowu.xsocket.server.client.IClientPool;
 import com.mirkowu.xsocket.server.IServerManager;
 
 import java.util.ArrayList;

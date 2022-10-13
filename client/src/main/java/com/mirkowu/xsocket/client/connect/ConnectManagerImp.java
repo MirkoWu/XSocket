@@ -1,9 +1,11 @@
 package com.mirkowu.xsocket.client.connect;
 
+import com.mirkowu.xsocket.client.TcpClient;
+import com.mirkowu.xsocket.client.UdpClient;
 import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
 import com.mirkowu.xsocket.core.SocketType;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.client.dispatcher.ActionDispatcher;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;

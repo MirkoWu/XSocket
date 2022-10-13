@@ -1,9 +1,6 @@
 package com.mirkowu.xsocket.server.client;
 
-import com.mirkowu.xsocket.core.action.IActionDispatcher;
-import com.mirkowu.xsocket.server.IClient;
-import com.mirkowu.xsocket.server.IClientSocketListener;
-import com.mirkowu.xsocket.server.ServerOptions;
+import com.mirkowu.xsocket.server.listener.IClientSocketListener;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;

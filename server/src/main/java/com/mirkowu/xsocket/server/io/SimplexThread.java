@@ -4,8 +4,8 @@ import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
-import com.mirkowu.xsocket.core.io.IReceiver;
-import com.mirkowu.xsocket.core.io.ISender;
+import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.ISender;
 import com.mirkowu.xsocket.core.io.LoopThread;
 import com.mirkowu.xsocket.core.util.ByteUtils;
 

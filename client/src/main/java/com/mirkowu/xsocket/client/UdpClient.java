@@ -1,7 +1,8 @@
-package com.mirkowu.xsocket.client.connect;
+package com.mirkowu.xsocket.client;
 
 import android.net.wifi.WifiManager;
 
+import com.mirkowu.xsocket.client.connect.IClientSocket;
 import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
 

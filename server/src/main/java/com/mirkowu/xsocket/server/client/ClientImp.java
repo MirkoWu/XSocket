@@ -1,14 +1,13 @@
 package com.mirkowu.xsocket.server.client;
 
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.SocketType;
-import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.exception.CacheException;
-import com.mirkowu.xsocket.server.IClientIOListener;
+import com.mirkowu.xsocket.server.listener.IClientIOListener;
 import com.mirkowu.xsocket.server.ServerOptions;
 import com.mirkowu.xsocket.server.io.ClientIOManager;
 import com.mirkowu.xsocket.server.action.ClientActionDispatcher;

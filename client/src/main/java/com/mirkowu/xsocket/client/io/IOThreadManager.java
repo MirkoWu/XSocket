@@ -2,19 +2,19 @@ package com.mirkowu.xsocket.client.io;
 
 import com.mirkowu.xsocket.core.IPConfig;
 import com.mirkowu.xsocket.client.Options;
-import com.mirkowu.xsocket.core.IUdpSendData;
+import com.mirkowu.xsocket.core.data.IUdpSendData;
 import com.mirkowu.xsocket.core.SocketType;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
-import com.mirkowu.xsocket.core.io.IReceiver;
-import com.mirkowu.xsocket.core.io.ISender;
-import com.mirkowu.xsocket.core.io.TcpReceiverImp;
-import com.mirkowu.xsocket.core.io.TcpSenderImp;
+import com.mirkowu.xsocket.core.IReceiver;
+import com.mirkowu.xsocket.core.ISender;
+import com.mirkowu.xsocket.core.tcp.TcpReceiverImp;
+import com.mirkowu.xsocket.core.tcp.TcpSenderImp;
 import com.mirkowu.xsocket.core.exception.ManualCloseException;
 import com.mirkowu.xsocket.core.io.IIOManager;
 import com.mirkowu.xsocket.core.io.IOThreadMode;
-import com.mirkowu.xsocket.core.io.UdpReceiverImp;
-import com.mirkowu.xsocket.core.io.UdpSenderImp;
+import com.mirkowu.xsocket.core.udp.UdpReceiverImp;
+import com.mirkowu.xsocket.core.udp.UdpSenderImp;
 
 import java.io.InputStream;
 import java.io.OutputStream;

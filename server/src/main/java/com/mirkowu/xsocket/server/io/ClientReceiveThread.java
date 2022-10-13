@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.server.io;
 
-import com.mirkowu.xsocket.core.io.IReceiver;
+import com.mirkowu.xsocket.core.IReceiver;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;

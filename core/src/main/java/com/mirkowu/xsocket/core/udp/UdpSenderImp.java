@@ -1,15 +1,13 @@
-package com.mirkowu.xsocket.core.io;
+package com.mirkowu.xsocket.core.udp;
 
 
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.IPulseSendData;
-import com.mirkowu.xsocket.core.ISendData;
-import com.mirkowu.xsocket.core.IUdpSendData;
-import com.mirkowu.xsocket.core.R;
-import com.mirkowu.xsocket.core.XLog;
+import com.mirkowu.xsocket.core.data.IPulseSendData;
+import com.mirkowu.xsocket.core.data.ISendData;
+import com.mirkowu.xsocket.core.data.IUdpSendData;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
-import com.mirkowu.xsocket.core.util.ByteUtils;
+import com.mirkowu.xsocket.core.AbsSender;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

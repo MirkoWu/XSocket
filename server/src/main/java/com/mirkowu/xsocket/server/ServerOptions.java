@@ -1,17 +1,15 @@
 package com.mirkowu.xsocket.server;
 
 import com.mirkowu.xsocket.core.SocketType;
-import com.mirkowu.xsocket.core.io.AbsReceiver;
-import com.mirkowu.xsocket.core.io.AbsSender;
-import com.mirkowu.xsocket.core.io.IReceiver;
-import com.mirkowu.xsocket.core.io.ISender;
-
-import java.nio.ByteOrder;
+import com.mirkowu.xsocket.core.AbsReceiver;
+import com.mirkowu.xsocket.core.AbsSender;
 
 public class ServerOptions implements IIOCoreOptions {
     private SocketType socketType = SocketType.TCP;
     private AbsReceiver receiver;
     private AbsSender sender;
+    private int maxConnectCapacity = 50;
+    private boolean isDebug = false;
 
     public SocketType getSocketType() {
         return socketType;
@@ -31,50 +29,29 @@ public class ServerOptions implements IIOCoreOptions {
         this.sender = sender;
         return this;
     }
+    public ServerOptions setDebug(boolean isDebug) {
+        this.isDebug = isDebug;
+        return this;
+    }
 
     @Override
     public int getMaxConnectCapacity() {
-        return 2;
+        return maxConnectCapacity;
     }
 
     @Override
     public AbsSender getSender() {
-        return null;
+        return sender;
     }
 
     @Override
     public AbsReceiver getReceiver() {
-        return null;
-    }
-
-    @Override
-    public ByteOrder getReadByteOrder() {
-        return null;
-    }
-
-    @Override
-    public int getMaxReadDataMB() {
-        return 0;
-    }
-
-    @Override
-    public ByteOrder getWriteByteOrder() {
-        return null;
-    }
-
-    @Override
-    public int getReadPackageBytes() {
-        return 0;
-    }
-
-    @Override
-    public int getWritePackageBytes() {
-        return 0;
+        return receiver;
     }
 
     @Override
     public boolean isDebug() {
-        return false;
+        return isDebug;
     }
 
     public static ServerOptions getDefault() {

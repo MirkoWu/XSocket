@@ -1,6 +1,8 @@
-package com.mirkowu.xsocket.server;
+package com.mirkowu.xsocket.server.listener;
 
 
+import com.mirkowu.xsocket.server.client.IClientPool;
+import com.mirkowu.xsocket.server.IShutdown;
 
 public interface IServerSocketListener extends IClientIOListener{
     void onServerListening(int serverPort);

@@ -1,13 +1,13 @@
 package com.mirkowu.xsocket.server.action;
 
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 import com.mirkowu.xsocket.core.XLog;
 import com.mirkowu.xsocket.core.action.ActionBean;
 import com.mirkowu.xsocket.core.action.ActionType;
 import com.mirkowu.xsocket.core.action.IActionDispatcher;
 import com.mirkowu.xsocket.core.listener.IRegister;
-import com.mirkowu.xsocket.server.IClientSocketListener;
+import com.mirkowu.xsocket.server.listener.IClientSocketListener;
 
 public class ClientActionDispatcher implements IActionDispatcher, IRegister<IClientSocketListener> {
 

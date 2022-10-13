@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.core.io;
 
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 
 public interface IIOManager {
     void start();

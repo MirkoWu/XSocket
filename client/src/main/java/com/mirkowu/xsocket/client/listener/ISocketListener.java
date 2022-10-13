@@ -2,8 +2,8 @@ package com.mirkowu.xsocket.client.listener;
 
 
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.IPulseSendData;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.IPulseSendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 
 public interface ISocketListener extends IConnectStatusListener {
 

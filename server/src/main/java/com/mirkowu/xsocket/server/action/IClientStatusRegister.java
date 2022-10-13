@@ -1,6 +1,6 @@
 package com.mirkowu.xsocket.server.action;
 
-import com.mirkowu.xsocket.server.IClientStatusListener;
+import com.mirkowu.xsocket.server.listener.IClientStatusListener;
 
 public interface IClientStatusRegister {
     void registerClientStatusListener(IClientStatusListener listener);

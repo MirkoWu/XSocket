@@ -1,7 +1,7 @@
-package com.mirkowu.xsocket.server;
+package com.mirkowu.xsocket.server.listener;
 
 import com.mirkowu.xsocket.core.IPConfig;
-import com.mirkowu.xsocket.core.ISendData;
+import com.mirkowu.xsocket.core.data.ISendData;
 
 public interface IClientSocketListener {
 
