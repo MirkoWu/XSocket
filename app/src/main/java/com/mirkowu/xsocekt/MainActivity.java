@@ -255,6 +255,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void clickTCP(View view) {
-        startActivity(new Intent(this, TcpActivity.class));
+        ClientActivity.start(this,SocketType.TCP);
+    }
+
+    public void clickUDP(View view) {
+        ClientActivity.start(this,SocketType.UDP);
     }
 }

@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.XSocket">
         <activity
-            android:name=".TcpActivity"
+            android:name=".ClientActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:exported="true" >
 

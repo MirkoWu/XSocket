@@ -2,6 +2,8 @@ package com.mirkowu.xsocekt;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,19 +25,31 @@ import com.mirkowu.xsocket.core.util.ByteUtils;
 
 import java.io.IOException;
 
-public class TcpActivity extends AppCompatActivity implements ISocketListener {
+public class ClientActivity extends AppCompatActivity implements ISocketListener {
+
+
+    public static void start(Context context, SocketType socketType) {
+        Intent starter = new Intent(context, ClientActivity.class);
+        starter.putExtra("SocketType", socketType.ordinal());
+        context.startActivity(starter);
+    }
 
     ActivityTcpBinding binding;
 
     IConnectManager manager;
+    SocketType socketType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityTcpBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
+        int type = getIntent().getIntExtra("SocketType", SocketType.TCP.ordinal());
+        if (type == SocketType.TCP.ordinal()) {
+            socketType = SocketType.TCP;
+        } else {
+            socketType = SocketType.UDP;
+        }
     }
 
     public void clickConnect(View view) {
@@ -51,7 +65,7 @@ public class TcpActivity extends AppCompatActivity implements ISocketListener {
                 return;
             }
             manager = XSocket.config(ip, Integer.parseInt(port),
-                    Options.defaultOptions().setSocketType(SocketType.UDP));
+                    Options.defaultOptions().setSocketType(socketType));
             manager.registerSocketListener(this);
             manager.connect();
         } else {
