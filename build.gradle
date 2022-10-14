@@ -47,7 +47,7 @@ ext {
     //编译版本不能大于30 否则要Java8以上才能支持，导致jitpack打包失败
     compileSdkVersion = 30
     targetSdkVersion = 29
-    minSdkVersion = 21
+    minSdkVersion = 14
 
     //google
     core_ktx_version = '1.6.0'

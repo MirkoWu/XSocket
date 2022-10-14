@@ -31,8 +31,6 @@ public class ClientImp extends AbsClient {
 
     private volatile ServerOptions mServerOptions;
 
-    private volatile List<IClientIOListener> clientIOListenerList = new ArrayList<>();
-
     public ClientImp(ServerOptions serverOptions, IActionDispatcher serverActionDispatcher) {
         this.mServerOptions = serverOptions;
         this.serverActionDispatcher = serverActionDispatcher;
@@ -114,7 +112,6 @@ public class ClientImp extends AbsClient {
         } catch (IOException e1) {
         }
 
-        // removeAllClientIOListener();
         isReadThreadStarted = false;
     }
 
@@ -166,17 +163,6 @@ public class ClientImp extends AbsClient {
             this.port = config.port;
         }
         serverActionDispatcher.dispatchAction(ActionType.ACTION_RECEIVE, new ActionBean(bytes, this));
-//        for (IClientIOListener listener : clientIOListenerList) {
-//            try {
-//                if (getSocketType() == SocketType.UDP) {
-//                    this.hostIp = config.ip;
-//                    this.port = config.port;
-//                }
-//                listener.onReceiveFromClient(bytes, this, clientPool);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     @Override
@@ -186,45 +172,6 @@ public class ClientImp extends AbsClient {
             this.port = config.port;
         }
         serverActionDispatcher.dispatchAction(ActionType.ACTION_SEND, new ActionBean(sendData, this));
-
-//        for (IClientIOListener listener : clientIOListenerList) {
-//            try {
-//                listener.onSendToClient(sendData, this, clientPool);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
-//    @Override
-//    public void addClientIOListener(IClientIOListener listener) {
-//        if (isDead) {
-//            return;
-//        }
-//        synchronized (clientIOListenerList) {
-//            if (!clientIOListenerList.contains(listener)) {
-//                clientIOListenerList.add(listener);
-//            }
-//        }
-//        synchronized (ioManager) {
-//            if (!isReadThreadStarted) {
-//                isReadThreadStarted = true;
-//                ioManager.startReceiveThread();
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public void removeClientIOListener(IClientIOListener listener) {
-//        synchronized (clientIOListenerList) {
-//            clientIOListenerList.remove(listener);
-//        }
-//    }
-//
-//    @Override
-//    public void removeAllClientIOListener() {
-//        synchronized (clientIOListenerList) {
-//            clientIOListenerList.clear();
-//        }
-//    }
 }
