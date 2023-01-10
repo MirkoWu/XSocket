@@ -3,6 +3,7 @@ package com.mirkowu.xsocket.server;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,7 +14,10 @@ public class TcpServer implements IServerSocket {
     @Override
     public void createServerSocket(int serverPort) throws IOException {
         this.mServerPort = serverPort;
-        mServerSocket = new ServerSocket(mServerPort);
+        mServerSocket = new ServerSocket();
+        mServerSocket.setReuseAddress(true);
+        mServerSocket.bind(new InetSocketAddress(mServerPort));
+
     }
 
     @Override
