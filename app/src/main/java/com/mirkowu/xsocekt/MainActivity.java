@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 注册nsd
+     * 注册nsd,注册完了 客户端要找到这个服务，要NsdManager#discoverService
      */
     private void registerService() {
         // Create the NsdServiceInfo object, and populate it.
