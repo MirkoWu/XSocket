@@ -1,8 +1,13 @@
 package com.mirkowu.xsocekt;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -27,17 +32,53 @@ import com.mirkowu.xsocket.server.XSocketServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class MainActivity extends AppCompatActivity {
-
+    NsdManager nsdManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         XSocket.setDebug(true);
+
+
+        nsdManager= (NsdManager) getSystemService(Context.NSD_SERVICE);
+
+        registerService();
     }
 
+    /**
+     * 注册nsd
+     */
+    private void registerService() {
+        // Create the NsdServiceInfo object, and populate it.
+        NsdServiceInfo serviceInfo =new NsdServiceInfo();
+        serviceInfo.setServiceName("DistributedAlbum1111");
+        serviceInfo.setServiceType("_nsdalbum._tcp");
+        serviceInfo.setPort(8888);
+        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, new NsdManager.RegistrationListener() {
+            @Override
+            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                XLog.e("server  , nsd onRegistrationFailed:" + serviceInfo.toString());
+            }
+
+            @Override
+            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                XLog.e("server  , nsd onUnregistrationFailed:" + serviceInfo.toString());
+            }
+
+            @Override
+            public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+                XLog.e("server  , nsd onServiceRegistered:" + serviceInfo.toString());
+            }
+
+            @Override
+            public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+                XLog.e("server  , nsd onServiceUnregistered:" + serviceInfo.toString());
+        }});
+
+    }
     IServerManager serverManager;
     public static volatile long startTime;
     IServerSocketListener serverSocketListener=new IServerSocketListener() {
@@ -131,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
     };
     public void clickServer(View view) {
         serverManager = XSocketServer.getServer(8888,
-                ServerOptions.getDefault().setSocketType(SocketType.UDP));
+                ServerOptions.getDefault().setSocketType(SocketType.TCP));
         serverManager.registerSocketListener(serverSocketListener);
         serverManager.registerClientStatusListener(clientStatusListener);
         serverManager.listen();
