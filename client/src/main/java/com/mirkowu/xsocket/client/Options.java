@@ -45,7 +45,7 @@ public class Options {
         return this;
     }
 
-    public Options setPulseFrequency(int pulseFrequency) {
+    public Options setPulseFrequency(long pulseFrequency) {
         this.pulseFrequency = pulseFrequency;
         return this;
     }

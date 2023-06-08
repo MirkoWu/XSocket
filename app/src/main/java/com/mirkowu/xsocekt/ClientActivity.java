@@ -33,6 +33,7 @@ public class ClientActivity extends AppCompatActivity implements ISocketListener
         starter.putExtra("SocketType", socketType.ordinal());
         context.startActivity(starter);
     }
+    public static final String PULSE_DATA = "0x0101";
 
     ActivityTcpBinding binding;
 
@@ -65,8 +66,16 @@ public class ClientActivity extends AppCompatActivity implements ISocketListener
                 return;
             }
             manager = XSocket.config(ip, Integer.parseInt(port),
-                    Options.defaultOptions().setSocketType(socketType));
+                    Options.defaultOptions().setSocketType(socketType)
+                            .setPulseFeedLoseTimes(60)
+                            .setPulseFrequency(5000));
             manager.registerSocketListener(this);
+            manager.getPulseManager().setPulseSendData(new IPulseSendData() {
+                @Override
+                public byte[] getData() {
+                    return PULSE_DATA.getBytes();
+                }
+            });
             manager.connect();
         } else {
             manager.disconnect();
@@ -77,6 +86,7 @@ public class ClientActivity extends AppCompatActivity implements ISocketListener
     protected void onDestroy() {
         if (manager != null) {
             manager.disconnect();
+            manager.getPulseManager().dead();
             manager.removeAllSocketListener();
         }
         super.onDestroy();
@@ -115,6 +125,8 @@ public class ClientActivity extends AppCompatActivity implements ISocketListener
 
     @Override
     public void onConnectSuccess(IPConfig config) {
+        manager.getPulseManager().pulse();//开启心跳
+
         binding.btnConnect.setText("已连接，点击断开连接");
         binding.btnSend.setEnabled(true);
     }

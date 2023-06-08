@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.mirkowu.xsocket.client.connect.IConnectManager;
 import com.mirkowu.xsocket.core.IPConfig;
@@ -30,17 +32,28 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
+    RadioGroup rgType;
+    RadioButton rbTcp;
+    RadioButton rbUdp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         XSocket.setDebug(true);
+
+        rgType = findViewById(R.id.rgType);
+        rbTcp = findViewById(R.id.rbTcp);
+        rbUdp = findViewById(R.id.rbUdp);
     }
 
+    SocketType socketType = SocketType.TCP;
+
+    public static final String PULSE_DATA = "0x0101";
     IServerManager serverManager;
     public static volatile long startTime;
-    IServerSocketListener serverSocketListener=new IServerSocketListener() {
+    IServerSocketListener serverSocketListener = new IServerSocketListener() {
 
         @Override
         public void onServerListening(int serverPort) {
@@ -50,12 +63,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceiveFromClient(byte[] bytes, IClient client, IClientPool<String, IClient> clientPool) {
-            XLog.e("server onReceiveFromClient :" +client.getHostIp()+":"+client.getHostPort()+" "+ ByteUtils.bytes2String(bytes));
+            XLog.e("server onReceiveFromClient :" + client.getHostIp() + ":" + client.getHostPort() + " " + ByteUtils.bytes2String(bytes));
             if (bytes == null || bytes.length == 0) return;
+
             if (client.getSocketType() == SocketType.TCP) {
                 client.send(new ISendData() {
                     @Override
                     public byte[] getData() {
+                        //检测心跳,并ack
+                        if (PULSE_DATA.equals(ByteUtils.bytes2String(bytes))) {
+                            return PULSE_DATA.getBytes();
+                        }
                         return ByteUtils.concat(bytes, "-我已收到：".getBytes());
                     }
                 });
@@ -77,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public byte[] getData() {
+                        //检测心跳，并ack
+                        if (PULSE_DATA.equals(ByteUtils.bytes2String(bytes))) {
+                            return PULSE_DATA.getBytes();
+                        }
                         return ByteUtils.concat(bytes, "-我已收到1111：".getBytes());
                     }
                 });
@@ -90,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onSendToClient(ISendData sendData, IClient client, IClientPool<String, IClient> clientPool) {
-            XLog.e("server onSendToClient :"+client.getHostIp()+":"+client.getHostPort()+" " + ByteUtils.bytes2String(sendData.getData()));
+            XLog.e("server onSendToClient :" + client.getHostIp() + ":" + client.getHostPort() + " " + ByteUtils.bytes2String(sendData.getData()));
 
         }
 
@@ -106,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    IClientStatusListener clientStatusListener= new IClientStatusListener() {
+    IClientStatusListener clientStatusListener = new IClientStatusListener() {
         @Override
         public void onClientConnected(IClient client, int serverPort, IClientPool clientPool) {
             XLog.e("server  , onClientConnected :" + client.getHostName() + ":" + serverPort);
@@ -129,9 +151,11 @@ public class MainActivity extends AppCompatActivity {
             XLog.e("server  , onClientDisconnected :" + client.getHostName() + ":" + serverPort + (e != null ? e.toString() : "null"));
         }
     };
+
     public void clickServer(View view) {
+        socketType = rbTcp.isChecked() ? SocketType.TCP : SocketType.UDP;
         serverManager = XSocketServer.getServer(8888,
-                ServerOptions.getDefault().setSocketType(SocketType.UDP));
+                ServerOptions.getDefault().setSocketType(socketType));
         serverManager.registerSocketListener(serverSocketListener);
         serverManager.registerClientStatusListener(clientStatusListener);
         serverManager.listen();
@@ -143,122 +167,99 @@ public class MainActivity extends AppCompatActivity {
             serverManager.shutdown();
         }
     }
-
-    IConnectManager manager;
-    ISocketListener socketListener=new ISocketListener() {
-
-        @Override
-        public void onSend(IPConfig config, ISendData sendData) {
-            XLog.e("onSend :" + ByteUtils.bytes2String(sendData.getData()));
-        }
-
-        @Override
-        public void onReceive(IPConfig config, byte[] bytes) {
-            XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
-        }
-
-        @Override
-        public void onConnectSuccess(IPConfig config) {
-            XLog.e("onConnect");
-        }
-
-        @Override
-        public void onConnectFail(IPConfig config, Exception e) {
-            XLog.e("onConnectFail");
-        }
-
-        @Override
-        public void onDisConnect(IPConfig config, Exception e) {
-            XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
-        }
-
-        @Override
-        public void onReconnect(IPConfig config) {
-            XLog.e("onReConnect");
-        }
-
-        @Override
-        public void onPulseSend(IPConfig config, IPulseSendData sendData) {
-            XLog.e("onPulseSend" + ByteUtils.bytes2String(sendData.getData()));
-        }
-    };
-    public void clickConnect(View view) {
-        if (manager != null && manager.isConnected()) {
-            manager.disconnect();
-        }
-        manager = XSocket.config("192.168.1.1", 80);
-//        manager = XSocket.config("127.0.0.1", 8888);
-//        manager = XSocket.config("192.168.2.104", 8888);
-        manager.registerSocketListener(socketListener);
-        manager.connect();
-
-    }
+//
+//    IConnectManager manager;
+//    ISocketListener socketListener=new ISocketListener() {
+//
+//        @Override
+//        public void onSend(IPConfig config, ISendData sendData) {
+//            XLog.e("onSend :" + ByteUtils.bytes2String(sendData.getData()));
+//        }
+//
+//        @Override
+//        public void onReceive(IPConfig config, byte[] bytes) {
+//            XLog.e("onReceive :" + ByteUtils.bytes2String(bytes));
+//            if (PULSE_DATA.equals(ByteUtils.bytes2String(bytes))) {
+//                manager.getPulseManager().feed();//收到返回心跳后喂狗
+//            }
+//        }
+//
+//        @Override
+//        public void onConnectSuccess(IPConfig config) {
+//            XLog.e("onConnect");
+//            manager.getPulseManager().pulse();//开启心跳
+//        }
+//
+//        @Override
+//        public void onConnectFail(IPConfig config, Exception e) {
+//            XLog.e("onConnectFail");
+//        }
+//
+//        @Override
+//        public void onDisConnect(IPConfig config, Exception e) {
+//            XLog.e("onDisConnect :" + (e == null ? "null" : e.toString()));
+//        }
+//
+//        @Override
+//        public void onReconnect(IPConfig config) {
+//            XLog.e("onReConnect");
+//        }
+//
+//        @Override
+//        public void onPulseSend(IPConfig config, IPulseSendData sendData) {
+//            XLog.e("onPulseSend" + ByteUtils.bytes2String(sendData.getData()));
+//        }
+//    };
+//    public void clickConnect(View view) {
+//        if (manager != null && manager.isConnected()) {
+//            manager.disconnect();
+//        }
+//        manager = XSocket.config("192.168.1.1", 80);
+////        manager = XSocket.config("127.0.0.1", 8888);
+////        manager = XSocket.config("192.168.2.104", 8888);
+//        manager.registerSocketListener(socketListener);
+//        manager.getPulseManager().setPulseSendData(new IPulseSendData() {
+//            @Override
+//            public byte[] getData() {
+//                return PULSE_DATA.getBytes();
+//            }
+//        });
+//
+//        manager.connect();
+//
+//    }
 
     @Override
     protected void onDestroy() {
-        if (manager != null) {
-            manager.disconnect();
-        }
+//        if (manager != null) {
+//            manager.disconnect();
+//        }
         if (serverManager != null) {
             serverManager.shutdown();
         }
         super.onDestroy();
     }
-
-    /**
-     * 获取wifi列表的请求
-     *
-     * @return
-     */
-    public static JSONObject getWifiList() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("method", "getWifi");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    /**
-     * 发送心跳包
-     *
-     * @return
-     */
-    public static JSONObject getHeart() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("method", "HB");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
-    public void clickSend(View view) {
-
-        if (manager != null) {
-            manager.send(new ISendData() {
-                @Override
-                public byte[] getData() {
-                    return getWifiList().toString().getBytes();
-                }
-            });
-        }
-    }
-
-    public void clickDisConnect(View view) {
-        if (manager != null) {
-            manager.disconnect();
-        }
-    }
+//
+//    public void clickSend(View view) {
+//
+//        if (manager != null) {
+//            manager.send(new ISendData() {
+//                @Override
+//                public byte[] getData() {
+//                    return getWifiList().toString().getBytes();
+//                }
+//            });
+//        }
+//    }
+//
+//    public void clickDisConnect(View view) {
+//        if (manager != null) {
+//            manager.disconnect();
+//        }
+//    }
 
 
-    public void clickTCP(View view) {
-        ClientActivity.start(this,SocketType.TCP);
-    }
-
-    public void clickUDP(View view) {
-        ClientActivity.start(this,SocketType.UDP);
+    public void clickClient(View view) {
+        ClientActivity.start(this, socketType);
     }
 }
